@@ -28,7 +28,11 @@ parameters:
 commands:
   setenv-commit-date:
     steps:
-      - run: echo 'COMMIT_DATE="<< pipeline.parameters.commit_date >>"' >> $BASH_ENV
+      - run:
+          name: Set COMMIT_DATE environment variable
+          command: >
+            echo 'COMMIT_DATE="<< pipeline.parameters.commit_date >>"'
+            >> $BASH_ENV
   setenv-target-workflow:
     parameters:
       branch:
@@ -38,12 +42,18 @@ commands:
       - when:
           condition: << pipeline.parameters.target_workflow >>
           steps:
-            - run: echo 'export TARGET_WORKFLOW=<< pipeline.parameters.target_workflow >>' >> $BASH_ENV
+            - run:
+                name: name: Set TARGET_WORKFLOW environment variable
+                command: >
+                  echo 'export
+                  TARGET_WORKFLOW=<< pipeline.parameters.target_workflow >>'
+                  >> $BASH_ENV
       - when:
           condition:
             not: << pipeline.parameters.target_workflow >>
           steps:
             - run:
+                name: Fetch successful jobs for << parameters.branch >> branch
                 environment:
                   BASE_URL: https://circleci.com/api/v1.1/project
                   SLUG: gh/sensu/sensu-enterprise-go
@@ -51,33 +61,66 @@ commands:
                 command: >
                   curl -fsSLo builds.json -H "Circle-Token: $CIRCLE_TOKEN"
                   $BASE_URL/$SLUG/tree/<< parameters.branch >>$QUERY_PARAMS
-            - run: |
-                workflow=$(jq -r \
-                '[.[] | select(.workflows.workflow_name != "nightly")][0]
-                .workflows.workflow_id' \
-                builds.json)
-                echo "export TARGET_WORKFLOW=$workflow" >> $BASH_ENV
+            - run:
+                name: Set TARGET_WORKFLOW environment variable
+                command: |
+                  workflow=$(jq -r \
+                  '[.[] | select(.workflows.workflow_name != "nightly")][0]
+                  .workflows.workflow_id' \
+                  builds.json)
+                  echo "export TARGET_WORKFLOW=$workflow" >> $BASH_ENV
+      - run:
+          name: Ensure TARGET_WORKFLOW is set
+          run: |
+            if ["x$TARGET_WORKFLOW = "x"]; then
+              echo "TARGET_WORKFLOW is empty"
+              exit 1
+            fi
   setenv-target-branch-revision:
     parameters:
       workflow:
         type: string
         default: "$TARGET_WORKFLOW"
     steps:
-      - run: >
-          curl -fsSLo workflow.json -H "Circle-Token: $CIRCLE_TOKEN"
-          https://circleci.com/api/v2/workflow/<< parameters.workflow >>
-      - run: |
-          pipeline=$(jq -r .pipeline_number workflow.json)
-          echo "export TARGET_PIPELINE=$pipeline" >> $BASH_ENV
-      - run: >
-          curl -fsSLo pipeline.json -H "Circle-Token: $CIRCLE_TOKEN"
-          https://circleci.com/api/v2/project/gh/sensu/sensu-enterprise-go/pipeline/$TARGET_PIPELINE
-      - run: |
-          branch=$(jq -r .vcs.branch)
-          revision=$(jq -r .vcs.revision)
-          echo "export TARGET_BRANCH=$branch" >> $BASH_ENV
-          echo "export TARGET_REVISION=$revision" >> $BASH_ENV
-      - run: env
+      - run:
+          name: Fetch target workflow
+          command: >
+            curl -fsSLo workflow.json -H "Circle-Token: $CIRCLE_TOKEN"
+            https://circleci.com/api/v2/workflow/<< parameters.workflow >>
+      - run:
+          name: Set TARGET_PIPELINE environment variable
+          command: |
+            pipeline=$(jq -r .pipeline_number workflow.json)
+            echo "export TARGET_PIPELINE=$pipeline" >> $BASH_ENV
+      - run:
+          name: Fetch target pipeline
+          environment:
+            BASE_URL: https://circleci.com/api/v2/project
+            SLUG: gh/sensu/sensu-enterprise-go
+          command: >
+            curl -fsSLo pipeline.json -H "Circle-Token: $CIRCLE_TOKEN"
+            $BASE_URL/$SLUG/pipeline/$TARGET_PIPELINE
+      - run:
+          name: Set TARGET_BRANCH and TARGET_REVISION environment variables
+          command: |
+            branch=$(jq -r .vcs.branch pipeline.json)
+            revision=$(jq -r .vcs.revision pipeline.json)
+            echo "export TARGET_BRANCH=$branch" >> $BASH_ENV
+            echo "export TARGET_REVISION=$revision" >> $BASH_ENV
+      - run:
+          name: Ensure TARGET_BRANCH is set
+          run: |
+            if ["x$TARGET_BRANCH" = "x"]; then
+              echo "TARGET_BRANCH is empty"
+              exit 1
+            fi
+      - run:
+          name: Ensure TARGET_REVISION is set
+          run: |
+            if ["x$TARGET_REVISION = "x"]; then
+              echo "TARGET_REVISION is empty"
+              exit 1
+            fi
   linux-amd64-only:
     parameters:
       target:
@@ -285,7 +328,6 @@ commands:
         type: string
         default: "/tmp/artifacts/s3"
     steps:
-      - run: env
       - run:
           name: Upload artifacts to Amazon S3
           environment:
