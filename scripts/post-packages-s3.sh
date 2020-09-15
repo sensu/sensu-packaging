@@ -7,8 +7,8 @@ readonly SCRIPT_DIR="$(dirname "$0")"
 readonly AWS_S3_SENSU_CI_BUILDS_BUCKET="sensu-ci-builds"
 readonly findCmd=${FIND_CMD:-find}
 
-if [[ -z "$1" || -z "$2" ]]; then
-   echo "Usage: $0 [ deliverables directory ]" >&2
+if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
+   echo "Usage: $0 [ deliverables directory ] [ git branch ] [ git revision ]" >&2
    exit 1
 fi
 

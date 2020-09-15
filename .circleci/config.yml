@@ -23,7 +23,7 @@ parameters:
     default: ""
   publish:
     type: boolean
-    default: false
+    default: true
 
 commands:
   setenv-commit-date:
