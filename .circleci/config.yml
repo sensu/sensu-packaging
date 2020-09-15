@@ -33,6 +33,9 @@ commands:
           name: Set COMMIT_DATE environment variable
           command: >
             echo "COMMIT_DATE=$(cat << parameters.path >>)" >> $BASH_ENV
+      - run:
+          name: Print COMMIT_DATE
+          command: echo $COMMIT_DATE
   setenv-target-workflow:
     parameters:
       branch:
@@ -373,7 +376,7 @@ jobs:
       - fetch-job-artifacts:
           filter: "commit-date"
           job: build-<< parameters.target >>
-          destination: target/commit-date
+          destination: target
       - setenv-commit-date
       - fetch-job-artifacts:
           filter: ".tar.gz"
@@ -473,7 +476,7 @@ jobs:
       - fetch-job-artifacts:
           filter: "commit-date"
           job: build-windows_amd64
-          destination: target/commit-date
+          destination: target
       - setenv-commit-date
       - fetch-job-artifacts:
           filter: ".tar.gz"
