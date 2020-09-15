@@ -77,6 +77,7 @@ commands:
           revision=$(jq -r .vcs.revision)
           echo "export TARGET_BRANCH=$branch" >> $BASH_ENV
           echo "export TARGET_REVISION=$revision" >> $BASH_ENV
+      - run: env
   linux-amd64-only:
     parameters:
       target:
@@ -284,6 +285,7 @@ commands:
         type: string
         default: "/tmp/artifacts/s3"
     steps:
+      - run: env
       - run:
           name: Upload artifacts to Amazon S3
           environment:
