@@ -18,21 +18,21 @@ parameters:
   build_number:
     type: integer
     default: << pipeline.number >>
-  commit_date:
-    type: string
-    default: ""
   publish:
     type: boolean
     default: false
 
 commands:
   setenv-commit-date:
+    parameters:
+      path:
+        type: string
+        default: "target/commit-date"
     steps:
       - run:
           name: Set COMMIT_DATE environment variable
           command: >
-            echo 'COMMIT_DATE="<< pipeline.parameters.commit_date >>"'
-            >> $BASH_ENV
+            echo "COMMIT_DATE=$(cat << parameters.path >>)" >> $BASH_ENV
   setenv-target-workflow:
     parameters:
       branch:
@@ -362,7 +362,6 @@ jobs:
       - checkout
       - setenv-target-workflow
       - setenv-target-branch-revision
-      - setenv-commit-date
       - run: sudo apt update
       - run:
           name: Install RPM tools
@@ -371,6 +370,11 @@ jobs:
       - cmake/install
       - install-log-collector-linux
       - aws-cli/install
+      - fetch-job-artifacts:
+          filter: "commit-date"
+          job: build-<< parameters.target >>
+          destination: target/commit-date
+      - setenv-commit-date
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-<< parameters.target >>
@@ -465,8 +469,12 @@ jobs:
       - install-awscli-windows
       - setenv-target-workflow
       - setenv-target-branch-revision
-      - setenv-commit-date
       - install-log-collector-windows
+      - fetch-job-artifacts:
+          filter: "commit-date"
+          job: build-windows_amd64
+          destination: target/commit-date
+      - setenv-commit-date
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-windows_386
