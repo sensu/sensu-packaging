@@ -72,7 +72,7 @@ commands:
       - run:
           name: Ensure TARGET_WORKFLOW is set
           command: |
-            if ["x$TARGET_WORKFLOW = "x"]; then
+            if ["x$TARGET_WORKFLOW" = "x"]; then
             echo "TARGET_WORKFLOW is empty"
             exit 1
             fi
@@ -117,7 +117,7 @@ commands:
       - run:
           name: Ensure TARGET_REVISION is set
           command: |
-            if ["x$TARGET_REVISION = "x"]; then
+            if ["x$TARGET_REVISION" = "x"]; then
             echo "TARGET_REVISION is empty"
             exit 1
             fi
