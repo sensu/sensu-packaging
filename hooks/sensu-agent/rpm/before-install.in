@@ -1,0 +1,14 @@
+#!/bin/sh
+
+%includesubst @HOOKS_DIR@/common/os-functions
+%includesubst @HOOKS_DIR@/common/group-functions
+%includesubst @HOOKS_DIR@/common/user-functions
+
+case "$1" in
+    1) # initial install
+    create_group
+    create_user
+    ;;
+    2) # upgrade
+    ;;
+esac

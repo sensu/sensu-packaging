@@ -1,0 +1,37 @@
+preinstall scriptlet (using /bin/sh):
+#!/bin/sh
+
+case "$1" in
+    1) # initial install
+    ;;
+    2) # upgrade
+    ;;
+esac
+postinstall scriptlet (using /bin/sh):
+
+#!/bin/sh
+
+case "$1" in
+    1) # initial install
+    ;;
+    2) # upgrade
+    ;;
+esac
+preuninstall scriptlet (using /bin/sh):
+#!/bin/sh
+
+case "$1" in
+    0) # uninstall
+    ;;
+    1) # upgrade
+    ;;
+esac
+postuninstall scriptlet (using /bin/sh):
+#!/bin/sh
+
+case "$1" in
+    0) # uninstall
+    ;;
+    1) # upgrade
+    ;;
+esac

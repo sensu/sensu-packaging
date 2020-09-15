@@ -1,0 +1,117 @@
+#!/bin/sh
+
+detected_os()
+{
+    platform="unknown"
+    unamestr=`uname`
+    if [ "$unamestr" = "AIX" ]; then
+        platform="aix"
+    elif [ "$unamestr" = "Darwin" ]; then
+        platform="mac"
+    elif [ "$unamestr" = "FreeBSD" ]; then
+        platform="freebsd"
+    elif [ "$unamestr" = "Linux" ]; then
+        platform="linux"
+    elif [ "$unamestr" = "SunOS" ]; then
+        platform="solaris"
+    fi
+    echo $platform
+}
+
+service_user()
+{
+    os=`detected_os`
+    set +e
+    if [ $os = "mac" ]; then
+        echo "_sensu"
+    else
+        echo "sensu"
+    fi
+    set -e
+}
+
+service_group()
+{
+    os=`detected_os`
+    set +e
+    if [ $os = "mac" ]; then
+        echo "_sensu"
+    else
+        echo "sensu"
+    fi
+    set -e
+}
+
+using_systemd()
+{
+    [ -e "/proc/1/comm" ] && grep -q "^systemd$" /proc/1/comm
+}
+
+os=`detected_os`
+if [ $os = "unknown" ]; then
+    echo "Unsupported OS"
+    exit 1
+fi
+
+fix_agent_owner()
+{
+    chown $(service_user):$(service_group) /var/cache/sensu/sensu-agent
+    chown $(service_user):$(service_group) /var/lib/sensu/sensu-agent
+    chown $(service_user):$(service_group) /var/log/sensu
+    chown $(service_user):$(service_group) /var/run/sensu
+}
+
+fix_backend_owner()
+{
+    chown $(service_user):$(service_group) /var/cache/sensu/sensu-backend
+    chown $(service_user):$(service_group) /var/lib/sensu/sensu-backend
+    chown $(service_user):$(service_group) /var/log/sensu
+    chown $(service_user):$(service_group) /var/run/sensu
+}
+
+install_init_unit()
+{
+    local _service_name="$1"
+    local _source_dir="$2"
+
+    if using_systemd; then
+        cp ${_source_dir}/${_service_name}.service /lib/systemd/system/
+        chmod 0644 /lib/systemd/system/${_service_name}.service
+    else
+        cp ${_source_dir}/${_service_name} /etc/init.d/
+        chmod 0755 /etc/init.d/${_service_name}
+    fi
+}
+
+remove_init_unit()
+{
+    local _service_name="$1"
+
+    if using_systemd; then
+        rm /lib/systemd/system/${_service_name}.service
+    else
+        rm /etc/init.d/$_service_name
+    fi
+}
+
+service=sensu-backend
+
+case "$1" in
+    remove)
+    if [ -f /lib/systemd/system/$service.service ]; then
+        remove_init_unit $service
+        systemctl --system daemon-reload >/dev/null || true
+    fi
+
+    ;;
+
+    upgrade|deconfigure|failed-upgrade)
+    ;;
+
+    *)
+    echo "prerm called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

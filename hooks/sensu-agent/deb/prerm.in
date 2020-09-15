@@ -1,0 +1,26 @@
+#!/bin/sh
+
+%includesubst @HOOKS_DIR@/common/os-functions
+%includesubst @HOOKS_DIR@/common/other-functions
+
+service=sensu-agent
+
+case "$1" in
+    remove)
+    if [ -f /lib/systemd/system/$service.service ]; then
+        remove_init_unit $service
+        systemctl --system daemon-reload >/dev/null || true
+    fi
+
+    ;;
+
+    upgrade|deconfigure|failed-upgrade)
+    ;;
+
+    *)
+    echo "prerm called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

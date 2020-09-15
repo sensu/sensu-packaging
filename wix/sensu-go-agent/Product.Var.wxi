@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <!-- Upgrade code (DO NOT CHANGE THIS) -->
+  <?define UpgradeCode="F8497B50-EC18-4F50-8CC8-1C9E53EEEB0B" ?>
+
+  <!-- The URL shown next to the installed app in Programs & Features -->
+  <?define InfoURL="https://sensu.io" ?>
+
+  <!-- Additional file paths -->
+  <?define sensuLicenseSourcePath="$(var.ProjectDir)\files\LICENSE.rtf" ?>
+  <?define sensuAgentConfigExampleSourcePath="$(var.ProjectDir)\files\agent-windows.yml.example" ?>
+  <?define bannerBmpPath="$(var.ProjectDir)\wix\assets\banner_background.bmp" ?>
+  <?define dialogBmpPath="$(var.ProjectDir)\wix\assets\dialog_background.bmp" ?>
+  <?define iconPath="$(var.ProjectDir)\wix\assets\project.ico" ?>
+
+  <!-- GUIDs -->
+
+  <!-- Platform bitness-specific variables -->
+  <?if $(sys.BUILDARCH)="x64" ?>
+  <?define Win64="yes" ?>
+  <?define PlatformProgramFilesFolder="ProgramFiles64Folder" ?>
+  <?define sensuAgentExeSourcePath="$(var.ProjectDir)\target\windows_amd64\sensu-agent.exe" ?>
+  <?elseif $(sys.BUILDARCH)="x86" ?>
+  <?define Win64="no" ?>
+  <?define PlatformProgramFilesFolder="ProgramFilesFolder" ?>
+  <?define sensuAgentExeSourcePath="$(var.ProjectDir)\target\windows_386\sensu-agent.exe" ?>
+  <?else ?>
+  <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+  <?endif ?>
+</Include>

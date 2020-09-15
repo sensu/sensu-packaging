@@ -1,0 +1,4 @@
+/usr/bin/sensuctl 0100755 root root
+/usr/share/doc/sensu-go-cli-@SENSU_VERSION@ 040755 root root
+/usr/share/doc/sensu-go-cli-@SENSU_VERSION@/LICENSE.txt 0100444 root root
+/usr/share/doc/sensu-go-cli-@SENSU_VERSION@/README.txt 0100444 root root

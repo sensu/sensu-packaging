@@ -1,0 +1,548 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@1.3.0
+  cmake: amdprophet/cmake@dev:first
+  docker: circleci/docker@1.4.0
+  signtool: amdprophet/signtool@dev:sixth
+  windows: circleci/windows@2.4.0
+  wixtoolset: amdprophet/wixtoolset@dev:first
+
+parameters:
+  target_workflow:
+    type: string
+    default: ""
+  sensu_version:
+    type: string
+    default: "6.0.0"
+  build_number:
+    type: integer
+    default: << pipeline.number >>
+  commit_date:
+    type: string
+    default: ""
+  publish:
+    type: boolean
+    default: false
+
+commands:
+  setenv-commit-date:
+    steps:
+      - run: echo 'COMMIT_DATE="<< pipeline.parameters.commit_date >>"' >> $BASH_ENV
+  setenv-target-workflow:
+    parameters:
+      branch:
+        type: string
+        default: "remove-packaging"
+    steps:
+      - when:
+          condition: << pipeline.parameters.target_workflow >>
+          steps:
+            - run: echo 'export TARGET_WORKFLOW=<< pipeline.parameters.target_workflow >>' >> $BASH_ENV'
+      - when:
+          condition:
+            not: << pipeline.parameters.target_workflow >>
+          steps:
+            - run:
+                environment:
+                  BASE_URL: https://circleci.com/api/v1.1/project
+                  SLUG: gh/sensu/sensu-enterprise-go
+                  QUERY_PARAMS: ?filter=successful
+                command: >
+                  curl -fsSLo builds.json -H "Circle-Token: $CIRCLE_TOKEN"
+                  $BASE_URL/$SLUG/tree/<< parameters.branch >>$QUERY_PARAMS
+            - run: |
+                workflow=$(jq -r \
+                '[.[] | select(.workflows.workflow_name != "nightly")][0]
+                .workflows.workflow_id' \
+                builds.json)
+                echo "export TARGET_WORKFLOW=$workflow" >> $BASH_ENV
+  setenv-target-branch-revision:
+    parameters:
+      workflow:
+        type: string
+        default: "$TARGET_WORKFLOW"
+    steps:
+      - run: >
+          curl -fsSLo workflow.json -H "Circle-Token: $CIRCLE_TOKEN"
+          https://circleci.com/api/v2/workflow/<< parameters.workflow >>
+      - run: |
+          pipeline=$(jq -r .pipeline_number workflow.json)
+          echo "export TARGET_PIPELINE=$pipeline" >> $BASH_ENV
+      - run: >
+          curl -fsSLo pipeline.json -H "Circle-Token: $CIRCLE_TOKEN"
+          https://circleci.com/api/v2/project/gh/sensu/sensu-enterprise-go/pipeline/$TARGET_PIPELINE
+      - run: |
+          branch=$(jq -r .vcs.branch)
+          revision=$(jq -r .vcs.revision)
+          echo "export TARGET_BRANCH=$branch" >> $BASH_ENV
+          echo "export TARGET_REVISION=$revision" >> $BASH_ENV
+  linux-amd64-only:
+    parameters:
+      target:
+        type: string
+      steps:
+        type: steps
+    steps:
+      - when:
+          condition:
+            equal: [<< parameters.target >>, "linux_amd64"]
+          steps: << parameters.steps >>
+  backend-platforms-only:
+    parameters:
+      target:
+        type: string
+      steps:
+        type: steps
+    steps:
+      - when:
+          condition:
+            or:
+              - equal: [<< parameters.target >>, "linux_amd64"]
+              - equal: [<< parameters.target >>, "linux_arm64"]
+              - equal: [<< parameters.target >>, "linux_ppc64le"]
+          steps: << parameters.steps >>
+  install-awscli-windows:
+    steps:
+      - run: curl -LO https://awscli.amazonaws.com/AWSCLIV2.msi
+      - run:
+          shell: powershell.exe
+          command: msiexec.exe /i AWSCLIV2.msi /quiet
+      - run: echo 'export PATH="/c/Program\ Files/Amazon/AWSCLIV2/bin:$PATH"' >> $BASH_ENV
+  fetch-job-artifacts:
+    description: Fetches a job artifacts for a given workflow & job name
+    parameters:
+      workflow:
+        type: string
+        default: "$TARGET_WORKFLOW"
+      job:
+        type: string
+      destination:
+        type: string
+        default: ""
+      filter:
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: Fetch artifacts for << parameters.job >>
+          command: >
+            ./scripts/circleci-fetch-artifacts.sh << parameters.workflow >>
+            << parameters.job >> << parameters.destination >>
+            << parameters.filter >>
+  extract-tarballs:
+    description: Extracts all tarballs in a given directory
+    parameters:
+      working_directory:
+        type: string
+      find_command:
+        type: string
+        default: "find"
+    steps:
+      - run:
+          name: Extract tarballs in << parameters.working_directory >>
+          working_directory: << parameters.working_directory >>
+          command: |
+            << parameters.find_command >> -name '*.tar.gz' -type f -exec tar -zxf {} \;
+  verify-binary:
+    parameters:
+      working_directory:
+        type: string
+      binary:
+        type: string
+    steps:
+      - run:
+          name: Verify file type of << parameters.working_directory >>/<< parameters.binary >>
+          working_directory: << parameters.working_directory >>
+          command: |
+            if ! file << parameters.binary >> | grep executable; then
+              file << parameters.binary >>
+              cat << parameters.binary >>
+            fi
+  verify-version:
+    parameters:
+      working_directory:
+        type: string
+      binary:
+        type: string
+    steps:
+      - run:
+          name: Verify version of << parameters.working_directory >>/<< parameters.binary >>
+          working_directory: << parameters.working_directory >>
+          command: ./<< parameters.binary >> version
+  build-msi:
+    parameters:
+      pkg-name:
+        description: Name of the package.
+        type: string
+      dist-path:
+        description: Relative path to the MSI dist directory (UNIX-style).
+        type: string
+        default: 'dist/msi'
+      wix-path:
+        description: Relative path to the Project's WiX directory (UNIX-style).
+        type: string
+        default: 'wix'
+      arch:
+        description: The architecture of the MSI package to build.
+        type: string
+        default: x64
+    steps:
+      - run:
+          name: Prepare environment variables for WiX
+          command: |
+            echo 'export PKG_DIST_PATH=$PWD/<< parameters.dist-path >>' >> $BASH_ENV
+            echo 'export WIX_PATH="${PWD}/<< parameters.wix-path >>/<< parameters.pkg-name >>"' >> $BASH_ENV
+            echo 'export PKG_VERSION="${SENSU_VERSION}.${BUILD_NUMBER}"' >> $BASH_ENV
+            echo 'export MSI_NAME=<< parameters.pkg-name >>_${PKG_VERSION}_en-US.<< parameters.arch >>.msi' >> $BASH_ENV
+            echo 'export MSI_PATH=${PKG_DIST_PATH}/${MSI_NAME}' >> $BASH_ENV
+            echo 'export PROJ_DIR=$(cygpath -w ${PWD})' >> $BASH_ENV
+      - run: |
+          mkdir -pv $PKG_DIST_PATH
+          cd $WIX_PATH
+          candle.exe -arch "<< parameters.arch >>" *.wxs -ext WixUtilExtension \
+            -dProjectDir="$PROJ_DIR" \
+            -dVersionNumber="${PKG_VERSION}"
+      - run: |
+          cd $WIX_PATH
+          light.exe -nologo -dcl:high -ext WixUiExtension \
+            -ext WixUtilExtension *.wixobj -cultures:en-us \
+            -loc Product_en-us.wxl -spdb -o "$(cygpath -w ${MSI_PATH})"
+  packagecloudgo:
+    steps:
+      - run: |
+          baseURL="https://github.com/amdprophet/packagecloud-go/releases/download"
+          version="0.1.2"
+          file="packagecloud-go_${version}_linux_amd64.tar.gz"
+          curl -Lo /tmp/packagecloud-go.tar.gz $baseURL/$version/$file
+      - run: tar -C /tmp -zxf /tmp/packagecloud-go.tar.gz
+      - run: sudo mv /tmp/packagecloud /usr/local/bin
+  install-log-collector-linux:
+    steps:
+      - run: |
+          version="74baa1cd0c959bb05de3f587ea978ef82b6612d5"
+          baseURL="https://s3-us-west-2.amazonaws.com/sensu.io"
+          filename="circleci-logs-${version}.linux_amd64.tar.gz"
+          curl -Lo /tmp/circleci-logs.tar.gz ${baseURL}/${filename}
+      - run: sudo tar -C /usr/local/bin -zxf /tmp/circleci-logs.tar.gz
+  install-log-collector-windows:
+    steps:
+      - run: mkdir -pv ~/bin
+      - run: echo 'export PATH="$PATH:$HOME/bin"' >> $BASH_ENV
+      - run: |
+          version="74baa1cd0c959bb05de3f587ea978ef82b6612d5"
+          baseURL="https://s3-us-west-2.amazonaws.com/sensu.io"
+          filename="circleci-logs-${version}.windows_amd64.tar.gz"
+          curl -Lo c:/tmp/circleci-logs.tar.gz ${baseURL}/${filename}
+      - run: tar -C ~/bin -zxf c:/tmp/circleci-logs.tar.gz
+  fetch-logs:
+    description: "Collect logs for the current job"
+    parameters:
+      binary:
+        type: string
+        default: "circleci-logs"
+      destination:
+        type: string
+        default: "/tmp/artifacts/s3/logs"
+    steps:
+      - run:
+          name: "Wait 10 seconds before attempting to collect logs"
+          command: sleep 10
+      - run:
+          name: "Create destination logs directory"
+          command: mkdir -pv << parameters.destination >>
+      - run: >
+          << parameters.binary >> fetch -t $CIRCLE_TOKEN
+          -o << parameters.destination >>/$CIRCLE_JOB.txt
+  gather-artifacts:
+    description: "Gather artifacts and copy them to the artifact directories"
+    parameters:
+      find_command:
+        type: string
+        default: "find"
+      source:
+        type: string
+      destination:
+        type: string
+      filename:
+        type: string
+    steps:
+      - run: mkdir -pv << parameters.destination >>
+      - run: >
+          << parameters.find_command >>
+          << parameters.source >>
+          -type f
+          -name "<< parameters.filename >>"
+          -exec cp {} << parameters.destination >> \;
+  upload-artifacts-to-s3:
+    description: "Upload artifacts to Amazon S3"
+    parameters:
+      find_command:
+        type: string
+        default: "find"
+      source:
+        type: string
+        default: "/tmp/artifacts/s3"
+    steps:
+      - run:
+          name: Upload artifacts to Amazon S3
+          environment:
+            FIND_CMD: << parameters.find_command >>
+          command: >
+            ./scripts/post-packages-s3.sh
+            << parameters.source >>
+            $TARGET_BRANCH
+            $TARGET_REVISION
+
+jobs:
+  build-linux-packages:
+    docker:
+      - image: cimg/python:3.8
+    parameters:
+      target:
+        type: string
+      destination:
+        type: string
+    environment:
+      TARGET_PLATFORM: << parameters.target >>
+    steps:
+      - checkout
+      - setenv-target-workflow
+      - setenv-target-branch-revision
+      - setenv-commit-date
+      - run: sudo apt update
+      - run:
+          name: Install RPM tools
+          command: sudo apt install rpm
+      - packagecloudgo
+      - cmake/install
+      - install-log-collector-linux
+      - aws-cli/install
+      - fetch-job-artifacts:
+          filter: ".tar.gz"
+          job: build-<< parameters.target >>
+          destination: << parameters.destination >>
+      - extract-tarballs:
+          working_directory: << parameters.destination >>
+      - backend-platforms-only:
+          target: << parameters.target >>
+          steps:
+            - verify-binary:
+                working_directory: << parameters.destination >>
+                binary: sensu-backend
+      - verify-binary:
+          working_directory: << parameters.destination >>
+          binary: sensu-agent
+      - verify-binary:
+          working_directory: << parameters.destination >>
+          binary: sensuctl
+      - linux-amd64-only:
+          target: << parameters.target >>
+          steps:
+            - verify-version:
+                working_directory: << parameters.destination >>
+                binary: sensu-agent
+            - verify-version:
+                working_directory: << parameters.destination >>
+                binary: sensu-backend
+            - verify-version:
+                working_directory: << parameters.destination >>
+                binary: sensuctl
+      - run:
+          name: Run CMake
+          working_directory: ../obj
+          environment:
+            SENSU_VERSION: "<< pipeline.parameters.sensu_version >>"
+            BUILD_NUMBER: "<< pipeline.parameters.build_number >>"
+          command: cmake $CIRCLE_WORKING_DIRECTORY
+      - run:
+          name: Build templates
+          working_directory: ../obj
+          command: make VERBOSE=1
+      - run:
+          name: Build packages
+          working_directory: ../obj
+          command: make sensu-packages VERBOSE=1
+      - run:
+          name: Test packages
+          working_directory: ../obj
+          command: make test-sensu-packages VERBOSE=1
+      - gather-artifacts:
+          filename: "*.deb"
+          source: "../obj"
+          destination: "/tmp/artifacts/s3/build/deb"
+      - gather-artifacts:
+          filename: "*.rpm"
+          source: "../obj"
+          destination: "/tmp/artifacts/s3/build/rpm"
+      - gather-artifacts:
+          filename: "*.deb"
+          source: "../obj"
+          destination: "/tmp/artifacts/circleci"
+      - gather-artifacts:
+          filename: "*.rpm"
+          source: "../obj"
+          destination: "/tmp/artifacts/circleci"
+      - store_artifacts:
+          path: "/tmp/artifacts/circleci"
+          destination: "."
+      - when:
+          condition: << pipeline.parameters.publish >>
+          steps:
+            - run:
+                name: Publish pack
+                working_directory: ../obj
+                command: make publish-sensu-packages VERBOSE=1
+            - fetch-logs
+            - upload-artifacts-to-s3
+  build-windows-packages:
+    executor:
+      name: windows/default
+      shell: bash.exe -eo pipefail
+    parameters:
+      package_name:
+        type: string
+      binary:
+        type: string
+    environment:
+      SENSU_VERSION: "<< pipeline.parameters.sensu_version >>"
+      BUILD_NUMBER: "<< pipeline.parameters.build_number >>"
+    steps:
+      - checkout
+      - install-awscli-windows
+      - setenv-target-workflow
+      - setenv-target-branch-revision
+      - setenv-commit-date
+      - install-log-collector-windows
+      - fetch-job-artifacts:
+          filter: ".tar.gz"
+          job: build-windows_386
+          destination: target/windows_386
+      - fetch-job-artifacts:
+          filter: ".tar.gz"
+          job: build-windows_amd64
+          destination: target/windows_amd64
+      - extract-tarballs:
+          working_directory: target/windows_386
+          find_command: /bin/find
+      - extract-tarballs:
+          working_directory: target/windows_amd64
+          find_command: /bin/find
+      - verify-binary:
+          working_directory: target/windows_386
+          binary: << parameters.binary >>
+      - verify-binary:
+          working_directory: target/windows_amd64
+          binary: << parameters.binary >>
+      - wixtoolset/install
+      - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
+      - run: unzip secure-file.zip
+      - run:
+          name: Decrypt codesigning certificate
+          shell: powershell.exe
+          command: >
+            .\secure-file.exe -decrypt codesign-cert.p12.enc
+            -secret $env:DECRYPTION_SECRET -salt $env:DECRYPTION_SALT
+      - signtool/import-certificate:
+          certificate: codesign-cert.p12
+      - signtool/sign:
+          working_directory: target/windows_386
+          file: << parameters.binary >>
+      - signtool/sign:
+          working_directory: target/windows_amd64
+          file: << parameters.binary >>
+      - build-msi:
+          pkg-name: << parameters.package_name >>
+          arch: x86
+      - build-msi:
+          pkg-name: << parameters.package_name >>
+          arch: x64
+      - signtool/sign:
+          working_directory: dist/msi
+          file: '*.msi'
+      - run:
+          name: Copy << parameters.package_name >> MSIs to choco tools
+          command: cp dist/msi/*.msi choco/<< parameters.package_name >>/tools
+      - run:
+          name: Set version & build number in << parameters.package_name >> nuspec
+          working_directory: choco/<< parameters.package_name >>
+          command: sed -i "s/REPLACEVERSION/${SENSU_VERSION}.${BUILD_NUMBER}/g" *.nuspec
+      - run:
+          name: Set checksum32 & checksum64 in choco VERIFICATION.txt
+          working_directory: choco/<< parameters.package_name >>/tools
+          command: |
+            checksum32="$(sha256sum *x86.msi | awk '{print $1}')"
+            checksum64="$(sha256sum *x64.msi | awk '{print $1}')"
+            sed -i "s/REPLACECHECKSUM32/${checksum32}/g" VERIFICATION.txt
+            sed -i "s/REPLACECHECKSUM64/${checksum64}/g" VERIFICATION.txt
+      - run:
+          name: Create choco package for << parameters.package_name >>
+          working_directory: choco/<< parameters.package_name >>
+          command: choco.exe pack
+      - gather-artifacts:
+          find_command: "/bin/find"
+          filename: "*.msi"
+          source: "choco/<< parameters.package_name >>/tools"
+          destination: "c:/tmp/artifacts/s3/build/msi"
+      - gather-artifacts:
+          find_command: "/bin/find"
+          filename: "*.nupkg"
+          source: "choco/<< parameters.package_name >>"
+          destination: "c:/tmp/artifacts/s3/build/nupkg"
+      - gather-artifacts:
+          find_command: "/bin/find"
+          filename: "*.msi"
+          source: "choco/<< parameters.package_name >>/tools"
+          destination: "c:/tmp/artifacts/circleci"
+      - gather-artifacts:
+          find_command: "/bin/find"
+          filename: "*.nupkg"
+          source: "choco/<< parameters.package_name >>"
+          destination: "c:/tmp/artifacts/circleci"
+      - store_artifacts:
+          path: "c:/tmp/artifacts/circleci"
+          destination: "."
+      - when:
+          condition: << pipeline.parameters.publish >>
+          steps:
+            - run:
+                name: Push nupkg to AppVeyor NuGet feed
+                working_directory: choco/<< parameters.package_name >>
+                command: >
+                  nuget push *.nupkg -ApiKey $APPVEYOR_NUGET_API_KEY -Source
+                  https://ci.appveyor.com/nuget/sensu-hjg205j7fvg1/api/v2/package
+            - fetch-logs:
+                binary: "circleci-logs.exe"
+                destination: "c:/tmp/artifacts/s3/logs"
+            - upload-artifacts-to-s3:
+                find_command: "/bin/find"
+                source: "c:/tmp/artifacts/s3"
+
+workflows:
+  packaging:
+    jobs:
+      - build-linux-packages:
+          name: << matrix.target >>
+          destination: target/<< matrix.target >>
+          matrix:
+            parameters:
+              target:
+                - linux_386
+                - linux_amd64
+                - linux_arm64
+                - linux_arm_5
+                - linux_arm_6
+                - linux_arm_7
+                - linux_mips_hardfloat
+                - linux_mipsle_hardfloat
+                #- linux_mips64le_hardfloat
+                - linux_ppc64le
+                - linux_s390x
+      - build-windows-packages:
+          name: windows_agent
+          package_name: sensu-go-agent
+          binary: sensu-agent.exe
+      - build-windows-packages:
+          name: windows_cli
+          package_name: sensu-go-cli
+          binary: sensuctl.exe

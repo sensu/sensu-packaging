@@ -1,0 +1,116 @@
+﻿
+From: https://sensu.io/sensu-license
+
+Sensu License
+
+Master License Agreement
+This Sensu Master License Agreement (this “Agreement”) is entered into by and between Sensu, Inc., with a business address of P.O. Box 8308, Portland, Oregon 97207 (“Sensu Inc”), and you or the entity you represent (“Customer”). This Agreement is effective as of the date it is accepted by Customer (the “Effective Date”).
+
+This Agreement governs Customer’s download, installation, and use of the Sensu Go software (the “Software”). If you are entering this Agreement on behalf of a company or other legal entity, you represent that you have the authority to bind the entity, its affiliates, and all users who access or use the Software on behalf of the entity. Terms and Conditions
+
+1. License
+Sensu Inc grants Customer a nonexclusive license to download, install, and use the Software, subject to the terms and conditions of this Agreement.
+
+2. Documentation
+Documentation in printed or electronic form, if any, is subject to the same terms applicable to the Software.
+
+3. Open-Source Components
+The Software includes Sensu Go (https://github.com/sensu/sensu-go), which is governed by the MIT open-source license (the “MIT License”), a copy of which is attached as Exhibit A. Any use of Sensu Go by Customer will be governed by, and subject to, the terms and conditions of the MIT License.
+
+4. Software Updates
+All Software modifications, upgrades, and releases (“Software Updates”) provided to Customer under this Agreement are to be considered part of the Software, and may be downloaded, installed, and used by Customer subject to the terms and conditions of this Agreement. Nothing in this Agreement transfers title to any Software Updates to Customer.
+
+5. Ownership of Software
+Sensu Inc owns all right, title, and interest, including all copyright, trademark, patent and any other proprietary and intellectual property rights embodied in the Software, including the source code, subject only to the rights of third parties in Open-Source Components and the limited license granted under this Agreement.
+
+6. Copies and Modifications
+The Software is protected by copyright laws. Except as expressly permitted under this Agreement, and subject to Section 3 with respect to Open-Source Components, Customer may not copy (including copying onto a public network), use, modify, display, sublicense, rent, sell, or distribute the Software or its source code. Customer may copy the Software (a) as necessary for the purpose of using it as permitted under this Agreement; and (b) for backup purposes.
+
+7. Internal Use Only
+Customer is not permitted to offer services to third parties from use of the Software. For more information on commercial licensing for managed service providers, please contact Sensu at sales@sensu.io.
+
+8. No Reverse Engineering
+Subject to Section 3 with respect to Open-Source Components, Customer may not disassemble, decompile, reverse engineer, or decrypt the Software.
+
+9. Proprietary Notices
+Customer may not remove, change, or obscure any copyright, trademark, or other proprietary notices in the Software or on any associated media. Customer must include the notices in any authorized copies.
+
+10. Confidentiality
+10.1. Trade Secret Status
+Customer acknowledges that the Software contains valuable trade secrets of Sensu Inc, the disclosure of which would cause irreparable harm to Sensu Inc.
+
+10.2. Confidential Information
+Customer will keep confidential Software source code (other than the source code of Open-Source Components), non-public details of operation or implementation of the Software, the financial terms of this Agreement, and any other information that Sensu Inc designates as confidential.
+
+10.3. Permitted Disclosure
+The parties may disclose to other potential customers of Sensu Inc the fact that Customer is using the Software, the general functions provided by the Software, and Customer’s general level of satisfaction with the Software.
+
+10.4. Reporting
+Customer will immediately report to Sensu Inc any threatened or actual unauthorized use or disclosure of the Software or other confidential information that comes to Customer’s attention.
+
+11. Support Services
+Sensu Inc will not provide any support services for the Software.
+
+12. Informing Staff
+Customer will inform its employees of the obligations stated in this Agreement. Customer is responsible for any breach of the obligations by its employees, contractors, and consultants.
+
+13. Term/Termination
+13.1. Termination by Sensu Inc
+Sensu Inc may terminate the license upon written notice for Customer’s failure to comply with this Agreement, or Customer’s failure to comply with any other written agreement between the parties.
+
+13.2. Effect of Termination
+Upon termination, Customer must immediately return or destroy the Software, together with all copies, adaptations and merged portions in any form. Customer will certify under oath the extent to which Customer has complied with this section, at Sensu Inc’s request. On the effective date of termination, all amounts then owned to Sensu Inc will become immediately due and payable.
+
+14. Export Requirements
+Customer may not export or re-export the Software in violation of any applicable laws or regulations.
+
+15. Disclaimer of Warranties
+THE SOFTWARE, DOCUMENTATION, AND SERVICES PROVIDED BY SENSU INC ARE PROVIDED “AS IS.” SENSU INC MAKES NO EXPRESS OR IMPLIED WARRANTIES, SUCH AS WARRANTIES OF PERFORMANCE, NONINFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. Although Sensu Inc believes the Software to be reliable for business use, Sensu Inc does not warrant that operation of the Software will be uninterrupted or error-free. Sensu Inc does not warrant that its Services or the Software Updates will result in an improvement to the Software, a solution to any problem Customer may have with the Software, or error-free operation of the Software. Sensu Inc will not have any responsibility or obligation in the event of an infringement or other intellectual property claim made against Customer due to Customer’s use of the Software.
+
+16. Responsibility for Use
+The Software is provided as a tool for Customer to use as Customer sees fit in its business. Customer is solely responsible for understanding the limitations of the Software. Sensu Inc is not responsible for any errors or omissions or for the results obtained from the use of the Software. Customer will indemnify Sensu Inc against any loss, liability, or costs (including reasonable attorney fees at trial or in any other proceeding) incurred on account of its use of the Software, whether or not attributable to the Software’s operation. Customer shall not use the Software to further discriminatory, fraudulent, or illegal activities. Customer acknowledges that this section is an important term of this Agreement, that it permits Sensu Inc to provide the Software at a reasonable price, and that Sensu Inc would not provide the Software without this section. CUSTOMER IS RESPONSIBLE FOR PROTECTING ITS DATA USED IN CONNECTION WITH THE SOFTWARE.
+
+17. Limitation of Liability
+SENSU INC’S LIABILITY TO CUSTOMER ON ANY CLAIM FOR DAMAGES ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL BE LIMITED TO DIRECT DAMAGES AND SHALL NOT EXCEED THE AMOUNT OF THE FEES PAID BY CUSTOMER UNDER THIS AGREEMENT. SENSU INC SHALL HAVE NO LIABILITY WHATSOEVER FOR SPECIAL, CONSEQUENTIAL, OR PUNITITVE DAMAGES (INCLUDING LOSS PROFITS OR REVENUE) OF CUSTOMER OR ANY THIRD PARTY, EVEN IF SENSU INC HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. CUSTOMER MAY BRING NO ACTION, REGARDLESS OF FORM, ARISING OUT OF THE SOFTWARE OR SERVICES PROVIDED HEREUNDER MORE THAN ONE (1) YEAR AFTER THE ACCRUAL OF THE CLAIM ON WHICH THE CAUSE OF ACTION IS BASED. THE LIMITATION IN THIS PARAGRAPH DOES NOT APPLY TO SENSU INC’S INDEMNIFICATION OBLIGATIONS PURSUANT TO SECTION 22.
+
+18. Transfer/Assignment
+Subject to prior approval by Sensu Inc, Customer may transfer the Software to a single recipient on a permanent basis provided Customer retains no copies of the Software and the recipient agrees in writing to the terms and conditions of this Agreement. Sensu Inc may assign this Agreement at any time without prior consent of Customer.
+
+19. Attorney Fees
+In any arbitration or litigation relating to this Agreement, the prevailing party will be entitled to recover all reasonable expenses of arbitration or litigation, including reasonable attorney fees at trial and on any appeal or petition for review, as determined by the judge or arbitrator.
+
+20. Counterparts
+This agreement may be executed in one or more counterparts. Transmission of a signed copy by fax will have the same effect as delivery of the signed original.
+
+21. Force Majeure
+Sensu Inc will not be responsible for delays or failures in performance resulting from causes beyond its control. Such causes include without limitation acts of God, war, riot, earthquake, embargo, acts of civil or military authorities, fire, flood, accident, strike, and shortages of transportation, facilities, fuel, energy, labor or material and any breakdown or interruption in service of communications, telecommunications, Internet, satellite, or any other medium of contact currently used or used in the future.
+
+22. Governing Law; Venue
+This agreement is governed by Oregon law, excluding choice-of-law provisions and excluding the United Nations Convention on Contracts for the International Sale of Goods. The state and federal courts of Oregon will have exclusive jurisdiction over the parties with respect to any dispute or controversy between them arising under or in connection with this Agreement. Venue for purposes of litigation will be Multnomah County, Oregon, and the parties waive all claims that such a forum is inconvenient or that a more convenient forum can be found.
+
+23. Survival
+Provisions regarding responsibility for use, rights in Software, and limitations, and all other provisions that could reasonably be expected to survive termination, will remain in effect following termination or expiration of this Agreement.
+
+24. Independent Contractor Status
+Sensu Inc is an independent contractor and not an employee or agent of Customer. Sensu Inc employees will not be eligible for any Customer-provided employee benefits.
+
+25. Modification and Waiver
+No modification or waiver of the provisions of this Agreement will be binding unless made in writing and signed by both parties. NO DIFFERENT OR ADDITIONAL TERMS ON ANY PURCHASE ORDER OR OTHER FORM UTILIZED BY CUSTOMER IN CONNECTION WITH THE SOFTWARE OR SENSU INC’S SERVICES WILL BE PART OF THIS AGREEMENT OR OTHERWISE BINDING ON SENSU INC.
+
+26. Notices
+Notices to Sensu Inc must be given in writing or by electronic means to Sensu Inc, PO Box 8308, Portland, OR 97207, notices@sensu.io. Notices to Customer must be given in writing or by electronic means to the contact information provided by Customer as part of the registration process. A party may change its address, e-mail address, or fax number for notices by giving the other party notice of the change. Notice will be deemed given at the earliest of (a) the date received; (b) if sent by overnight courier, the next business day; or (c) if sent by U.S. certified mail, return receipt requested, the fourth (4th) following business day.
+
+27. Severability
+If any restriction in this Agreement exceeds that permitted under applicable law, it is to be deemed modified to include the maximum permissible restriction. If any provision is nonetheless held unenforceable in any jurisdiction, the enforceability of this Agreement in any other jurisdiction and the enforceability of the remaining provisions in that jurisdiction will not be affected.
+
+NOTE: These Sensu Master License Agreement were last updated on December 5, 2018. Prior versions can be obtained by contacting Sensu.
+
+EXHIBIT A: MIT LICENSE
+The MIT License (MIT)
+Copyright (c) 2017 Sensu Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

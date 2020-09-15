@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>sensu-cli</id>
+    <version>REPLACEVERSION</version>
+    <owners>Sensu Engineering</owners>
+    <title>sensu-cli (Install)</title>
+    <authors>Sensu Inc</authors>
+    <projectUrl>https://github.com/sensu/sensu-go</projectUrl>
+    <copyright>2019 Sensu, Inc.</copyright>
+    <licenseUrl>https://sensu.io/sensu-license</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/sensu/sensu-enterprise-go</projectSourceUrl>
+    <docsUrl>https://docs.sensu.io/sensu-go/latest</docsUrl>
+    <mailingListUrl>https://discourse.sensu.io/</mailingListUrl>
+    <bugTrackerUrl>https://github.com/sensu/sensu-go/issues</bugTrackerUrl>
+    <tags>sensu-cli sensu cli go sensu-go sensuctl ctl monitor monitoring metric metrics</tags>
+    <summary>The official Sensu CLI tools</summary>
+    <description>Sensu CLI tools command-line tools to work with Sensu Go (e.g. sensuctl).</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

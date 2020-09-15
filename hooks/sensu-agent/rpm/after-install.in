@@ -1,0 +1,17 @@
+#!/bin/sh
+
+%includesubst @HOOKS_DIR@/common/os-functions
+%includesubst @HOOKS_DIR@/common/other-functions
+
+case "$1" in
+    1) # initial install
+    fix_agent_owner
+    ;;
+    2) # upgrade
+    fix_agent_owner
+    ;;
+
+esac
+
+# Done for both installs and upgrades.
+install_init_unit sensu-agent @SENSU_AGENT_RESOURCE_DIR@

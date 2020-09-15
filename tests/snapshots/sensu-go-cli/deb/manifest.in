@@ -1,0 +1,8 @@
+drwxr-xr-x root/root ./usr/
+drwxr-xr-x root/root ./usr/bin/
+-rwxr-xr-x root/root ./usr/bin/sensuctl
+drwxr-xr-x root/root ./usr/share/
+drwxr-xr-x root/root ./usr/share/doc/
+drwxr-xr-x root/root ./usr/share/doc/sensu-go-cli-5.2.1/
+-r--r--r-- root/root ./usr/share/doc/sensu-go-cli-5.2.1/LICENSE.txt
+-r--r--r-- root/root ./usr/share/doc/sensu-go-cli-5.2.1/README.txt

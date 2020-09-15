@@ -1,0 +1,5 @@
+Copyright 2018 Sensu, Inc.
+
+All rights reserved.
+
+For details, visit https://sensu.io/sensu-license

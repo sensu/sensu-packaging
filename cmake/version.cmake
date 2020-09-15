@@ -1,0 +1,28 @@
+# version is now read from the environment
+if(NOT DEFINED ENV{SENSU_VERSION})
+    message(FATAL_ERROR "SENSU_VERSION must be set")
+endif()
+
+set(SENSU_VERSION $ENV{SENSU_VERSION})
+
+if(NOT ${SENSU_VERSION} MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
+    message(FATAL_ERROR "SENSU_VERSION contains an invalid semantic version: ${SENSU_VERSION}")
+endif()
+
+string(REGEX MATCHALL "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$"
+    SENSU_VERSION_MATCH "${SENSU_VERSION}")
+
+set(SENSU_VERSION_MAJOR "${CMAKE_MATCH_1}")
+set(SENSU_VERSION_MINOR "${CMAKE_MATCH_2}")
+set(SENSU_VERSION_PATCH "${CMAKE_MATCH_3}")
+
+if(DEFINED ENV{BUILD_NUMBER})
+    message(STATUS "Using BUILD_NUMBER for PACKAGE_RELEASE")
+    set(PACKAGE_RELEASE $ENV{BUILD_NUMBER})
+else()
+    set(PACKAGE_RELEASE 1)
+endif()
+
+message(STATUS "PACKAGE_RELEASE is set to: ${PACKAGE_RELEASE}")
+
+set(SENSU_VERSION "${SENSU_VERSION_MAJOR}.${SENSU_VERSION_MINOR}.${SENSU_VERSION_PATCH}")

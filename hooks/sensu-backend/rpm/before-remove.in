@@ -1,0 +1,12 @@
+#!/bin/sh
+
+%includesubst @HOOKS_DIR@/common/os-functions
+%includesubst @HOOKS_DIR@/common/other-functions
+
+case "$1" in
+    0) # uninstall
+    remove_init_unit sensu-backend
+    ;;
+    1) # upgrade
+    ;;
+esac

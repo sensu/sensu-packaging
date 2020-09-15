@@ -1,0 +1,32 @@
+#!/bin/sh
+
+%includesubst @HOOKS_DIR@/common/os-functions
+%includesubst @HOOKS_DIR@/common/user-functions
+%includesubst @HOOKS_DIR@/common/group-functions
+%includesubst @HOOKS_DIR@/common/other-functions
+
+service=sensu-agent
+
+case "$1" in
+    configure)
+    create_group
+    create_user
+    fix_agent_owner
+    install_init_unit $service @SENSU_AGENT_RESOURCE_DIR@
+
+    if [ -f /lib/systemd/system/$service.service ]; then
+        systemctl --system daemon-reload >/dev/null || true
+    fi
+
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
