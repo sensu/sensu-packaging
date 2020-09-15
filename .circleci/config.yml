@@ -43,7 +43,7 @@ commands:
           condition: << pipeline.parameters.target_workflow >>
           steps:
             - run:
-                name: name: Set TARGET_WORKFLOW environment variable
+                name: Set TARGET_WORKFLOW environment variable
                 command: >
                   echo 'export
                   TARGET_WORKFLOW=<< pipeline.parameters.target_workflow >>'
