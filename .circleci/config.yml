@@ -73,8 +73,8 @@ commands:
           name: Ensure TARGET_WORKFLOW is set
           run: |
             if ["x$TARGET_WORKFLOW = "x"]; then
-              echo "TARGET_WORKFLOW is empty"
-              exit 1
+            echo "TARGET_WORKFLOW is empty"
+            exit 1
             fi
   setenv-target-branch-revision:
     parameters:
@@ -111,15 +111,15 @@ commands:
           name: Ensure TARGET_BRANCH is set
           run: |
             if ["x$TARGET_BRANCH" = "x"]; then
-              echo "TARGET_BRANCH is empty"
-              exit 1
+            echo "TARGET_BRANCH is empty"
+            exit 1
             fi
       - run:
           name: Ensure TARGET_REVISION is set
           run: |
             if ["x$TARGET_REVISION = "x"]; then
-              echo "TARGET_REVISION is empty"
-              exit 1
+            echo "TARGET_REVISION is empty"
+            exit 1
             fi
   linux-amd64-only:
     parameters:
