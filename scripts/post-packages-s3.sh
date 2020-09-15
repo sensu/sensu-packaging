@@ -9,6 +9,9 @@ readonly findCmd=${FIND_CMD:-find}
 
 if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
    echo "Usage: $0 [ deliverables directory ] [ git branch ] [ git revision ]" >&2
+   echo "1: $1"
+   echo "2: $2"
+   echo "3: $3"
    exit 1
 fi
 
