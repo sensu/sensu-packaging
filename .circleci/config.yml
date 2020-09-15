@@ -23,7 +23,7 @@ parameters:
     default: ""
   publish:
     type: boolean
-    default: true
+    default: false
 
 commands:
   setenv-commit-date:
@@ -328,6 +328,12 @@ commands:
         type: string
         default: "/tmp/artifacts/s3"
     steps:
+      - run:
+          name: Print AWS path
+          command: which aws
+      - run:
+          name: Print AWS version
+          command: aws --version
       - run:
           name: Upload artifacts to Amazon S3
           environment:
