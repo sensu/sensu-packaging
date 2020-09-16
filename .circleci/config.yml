@@ -32,8 +32,9 @@ commands:
       - run:
           name: Set << parameters.variable-name >> environment variable
           command: >
-            echo "<< parameters.variable-name >>=$(cat << parameters.path >>
-            | tr -d '\n')" >> $BASH_ENV
+            echo "export
+            << parameters.variable-name >>=$(cat << parameters.path >> | tr -d
+            '\n')" >> $BASH_ENV
       - run:
           name: Ensure << parameters.variable-name >> is set
           command: |
@@ -263,21 +264,30 @@ commands:
             -loc Product_en-us.wxl -spdb -o "$(cygpath -w ${MSI_PATH})"
   packagecloudgo:
     steps:
-      - run: |
-          baseURL="https://github.com/amdprophet/packagecloud-go/releases/download"
-          version="0.1.2"
-          file="packagecloud-go_${version}_linux_amd64.tar.gz"
-          curl -Lo /tmp/packagecloud-go.tar.gz $baseURL/$version/$file
-      - run: tar -C /tmp -zxf /tmp/packagecloud-go.tar.gz
-      - run: sudo mv /tmp/packagecloud /usr/local/bin
+      - run:
+          name: Download packagecloud-go tool
+          command: |
+            baseURL="https://github.com/amdprophet/packagecloud-go/releases/download"
+            version="0.1.2"
+            file="packagecloud-go_${version}_linux_amd64.tar.gz"
+            curl -Lo /tmp/packagecloud-go.tar.gz $baseURL/$version/$file
+      - run:
+          name: Install packagecloud-go tool
+          command: |
+            tar -C /tmp -zxf /tmp/packagecloud-go.tar.gz
+            sudo mv /tmp/packagecloud /usr/local/bin
   install-log-collector-linux:
     steps:
-      - run: |
-          version="74baa1cd0c959bb05de3f587ea978ef82b6612d5"
-          baseURL="https://s3-us-west-2.amazonaws.com/sensu.io"
-          filename="circleci-logs-${version}.linux_amd64.tar.gz"
-          curl -Lo /tmp/circleci-logs.tar.gz ${baseURL}/${filename}
-      - run: sudo tar -C /usr/local/bin -zxf /tmp/circleci-logs.tar.gz
+      - run:
+          name: Download circleci-logs tool
+          command: |
+            version="74baa1cd0c959bb05de3f587ea978ef82b6612d5"
+            baseURL="https://s3-us-west-2.amazonaws.com/sensu.io"
+            filename="circleci-logs-${version}.linux_amd64.tar.gz"
+            curl -Lo /tmp/circleci-logs.tar.gz ${baseURL}/${filename}
+      - run:
+          name: Install circleci-logs tool
+          command: sudo tar -C /usr/local/bin -zxf /tmp/circleci-logs.tar.gz
   install-log-collector-windows:
     steps:
       - run: mkdir -pv ~/bin
