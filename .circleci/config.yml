@@ -17,6 +17,10 @@ parameters:
     default: false
 
 commands:
+  create-target-directory:
+    - run:
+        name: Create target directory
+        command: mkdir -pv target
   setenv-from-file:
     parameters:
       variable-name:
@@ -27,7 +31,8 @@ commands:
       - run:
           name: Set << parameters.variable-name >> environment variable
           command: |
-            echo '<< parameters.variable-name >>="$(cat << parameters.path >>)"' >> $BASH_ENV
+            echo "<< parameters.variable-name >>=$(cat << parameters.path >>
+            | tr -d '\n')" >> $BASH_ENV
       - run:
           name: Ensure << parameters.variable-name >> is set
           command: |
@@ -132,14 +137,47 @@ commands:
         default: ""
     steps:
       - run:
-          name: Create << parameters.destination >> directory
-          command: mkdir -pv << parameters.destination >>
-      - run:
-          name: Fetch artifacts for << parameters.job >>
+          name: Fetch artifacts for << parameters.job >> with filter << parameters.filter >>
           command: >
             ./scripts/circleci-fetch-artifacts.sh << parameters.workflow >>
             << parameters.job >> << parameters.destination >>
             << parameters.filter >>
+  setup-metadata:
+    description: Fetches metadata files and sets environment variables
+    parameters:
+      target:
+        type: string
+    steps:
+      - fetch-job-artifacts:
+          filter: "commit-date"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "version"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "build-number"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "git-revision"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "git-branch"
+          job: build-<< parameters.target >>
+      - setenv-from-file:
+          variable-name: COMMIT_DATE
+          path: target/commit-date
+      - setenv-from-file:
+          variable-name: SENSU_VERSION
+          path: target/version
+      - setenv-from-file:
+          variable-name: BUILD_NUMBER
+          path: target/build-number
+      - setenv-from-file:
+          variable-name: TARGET_REVISION
+          path: target/git-revision
+      - setenv-from-file:
+          variable-name: TARGET_BRANCH
+          path: target/git-branch
   extract-tarballs:
     description: Extracts all tarballs in a given directory
     parameters:
@@ -325,7 +363,10 @@ jobs:
       TARGET_PLATFORM: << parameters.target >>
     steps:
       - checkout
+      - create-target-directory
       - setenv-target-workflow
+      - setup-metadata:
+          target: << parameters.target >>
       - run: sudo apt update
       - run:
           name: Install RPM tools
@@ -334,36 +375,6 @@ jobs:
       - cmake/install
       - install-log-collector-linux
       - aws-cli/install
-      - fetch-job-artifacts:
-          filter: "commit-date"
-          job: build-<< parameters.target >>
-      - fetch-job-artifacts:
-          filter: "version"
-          job: build-<< parameters.target >>
-      - fetch-job-artifacts:
-          filter: "build-number"
-          job: build-<< parameters.target >>
-      - fetch-job-artifacts:
-          filter: "git-revision"
-          job: build-<< parameters.target >>
-      - fetch-job-artifacts:
-          filter: "git-branch"
-          job: build-<< parameters.target >>
-      - setenv-from-file:
-          variable-name: COMMIT_DATE
-          path: target/commit-date
-      - setenv-from-file:
-          variable-name: SENSU_VERSION
-          path: target/version
-      - setenv-from-file:
-          variable-name: BUILD_NUMBER
-          path: target/build-number
-      - setenv-from-file:
-          variable-name: TARGET_REVISION
-          path: target/git-revision
-      - setenv-from-file:
-          variable-name: TARGET_BRANCH
-          path: target/git-branch
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-<< parameters.target >>
@@ -450,38 +461,11 @@ jobs:
     steps:
       - checkout
       - install-awscli-windows
+      - create-target-directory
       - setenv-target-workflow
+      - setup-metadata:
+          target: windows_amd64
       - install-log-collector-windows
-      - fetch-job-artifacts:
-          filter: "commit-date"
-          job: build-windows_amd64
-      - fetch-job-artifacts:
-          filter: "version"
-          job: build-windows_amd64
-      - fetch-job-artifacts:
-          filter: "build-number"
-          job: build-windows_amd64
-      - fetch-job-artifacts:
-          filter: "git-revision"
-          job: build-windows_amd64
-      - fetch-job-artifacts:
-          filter: "git-branch"
-          job: build-windows_amd64
-      - setenv-from-file:
-          variable-name: COMMIT_DATE
-          path: target/commit-date
-      - setenv-from-file:
-          variable-name: SENSU_VERSION
-          path: target/version
-      - setenv-from-file:
-          variable-name: BUILD_NUMBER
-          path: target/build-number
-      - setenv-from-file:
-          variable-name: TARGET_REVISION
-          path: target/git-revision
-      - setenv-from-file:
-          variable-name: TARGET_BRANCH
-          path: target/git-branch
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-windows_386
