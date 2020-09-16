@@ -12,30 +12,33 @@ parameters:
   target_workflow:
     type: string
     default: ""
-  sensu_version:
-    type: string
-    default: "6.0.0"
-  build_number:
-    type: integer
-    default: << pipeline.number >>
   publish:
     type: boolean
     default: false
 
 commands:
-  setenv-commit-date:
+  setenv-from-file:
     parameters:
+      variable-name:
+        type: env_var_name
       path:
         type: string
-        default: "target/commit-date"
     steps:
       - run:
-          name: Set COMMIT_DATE environment variable
+          name: Set << parameters.variable-name >> environment variable
           command: >
-            echo "COMMIT_DATE=$(cat << parameters.path >>)" >> $BASH_ENV
+            echo "<< parameters.variable-name >>=$(cat << parameters.path >>)"
+            >> $BASH_ENV
       - run:
-          name: Print COMMIT_DATE
-          command: echo $COMMIT_DATE
+          name: Ensure << parameters.variable-name >> is set
+          command: |
+            if [ "x${<< parameters.variable-name >>}" = "x" ]; then
+            echo "<< parameters.variable-name >> is empty"
+            exit 1
+            fi
+      - run:
+          name: Print << parameters.variable-name >>
+          command: echo $<< parameters.variable-name >>
   setenv-target-workflow:
     parameters:
       branch:
@@ -77,51 +80,6 @@ commands:
           command: |
             if ["x$TARGET_WORKFLOW" = "x"]; then
             echo "TARGET_WORKFLOW is empty"
-            exit 1
-            fi
-  setenv-target-branch-revision:
-    parameters:
-      workflow:
-        type: string
-        default: "$TARGET_WORKFLOW"
-    steps:
-      - run:
-          name: Fetch target workflow
-          command: >
-            curl -fsSLo workflow.json -H "Circle-Token: $CIRCLE_TOKEN"
-            https://circleci.com/api/v2/workflow/<< parameters.workflow >>
-      - run:
-          name: Set TARGET_PIPELINE environment variable
-          command: |
-            pipeline=$(jq -r .pipeline_number workflow.json)
-            echo "export TARGET_PIPELINE=$pipeline" >> $BASH_ENV
-      - run:
-          name: Fetch target pipeline
-          environment:
-            BASE_URL: https://circleci.com/api/v2/project
-            SLUG: gh/sensu/sensu-enterprise-go
-          command: >
-            curl -fsSLo pipeline.json -H "Circle-Token: $CIRCLE_TOKEN"
-            $BASE_URL/$SLUG/pipeline/$TARGET_PIPELINE
-      - run:
-          name: Set TARGET_BRANCH and TARGET_REVISION environment variables
-          command: |
-            branch=$(jq -r .vcs.branch pipeline.json)
-            revision=$(jq -r .vcs.revision pipeline.json)
-            echo "export TARGET_BRANCH=$branch" >> $BASH_ENV
-            echo "export TARGET_REVISION=$revision" >> $BASH_ENV
-      - run:
-          name: Ensure TARGET_BRANCH is set
-          command: |
-            if ["x$TARGET_BRANCH" = "x"]; then
-            echo "TARGET_BRANCH is empty"
-            exit 1
-            fi
-      - run:
-          name: Ensure TARGET_REVISION is set
-          command: |
-            if ["x$TARGET_REVISION" = "x"]; then
-            echo "TARGET_REVISION is empty"
             exit 1
             fi
   linux-amd64-only:
@@ -169,7 +127,7 @@ commands:
         type: string
       destination:
         type: string
-        default: ""
+        default: "target"
       filter:
         type: string
         default: ""
@@ -364,7 +322,6 @@ jobs:
     steps:
       - checkout
       - setenv-target-workflow
-      - setenv-target-branch-revision
       - run: sudo apt update
       - run:
           name: Install RPM tools
@@ -376,8 +333,33 @@ jobs:
       - fetch-job-artifacts:
           filter: "commit-date"
           job: build-<< parameters.target >>
-          destination: target
-      - setenv-commit-date
+      - fetch-job-artifacts:
+          filter: "version"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "build-number"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "git-revision"
+          job: build-<< parameters.target >>
+      - fetch-job-artifacts:
+          filter: "git-branch"
+          job: build-<< parameters.target >>
+      - setenv-from-file:
+          variable-name: COMMIT_DATE
+          path: target/commit-date
+      - setenv-from-file:
+          variable-name: SENSU_VERSION
+          path: target/version
+      - setenv-from-file:
+          variable-name: BUILD_NUMBER
+          path: target/build-number
+      - setenv-from-file:
+          variable-name: TARGET_REVISION
+          path: target/git-revision
+      - setenv-from-file:
+          variable-name: TARGET_BRANCH
+          path: target/git-branch
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-<< parameters.target >>
@@ -411,9 +393,6 @@ jobs:
       - run:
           name: Run CMake
           working_directory: ../obj
-          environment:
-            SENSU_VERSION: "<< pipeline.parameters.sensu_version >>"
-            BUILD_NUMBER: "<< pipeline.parameters.build_number >>"
           command: cmake $CIRCLE_WORKING_DIRECTORY
       - run:
           name: Build templates
@@ -464,20 +443,41 @@ jobs:
         type: string
       binary:
         type: string
-    environment:
-      SENSU_VERSION: "<< pipeline.parameters.sensu_version >>"
-      BUILD_NUMBER: "<< pipeline.parameters.build_number >>"
     steps:
       - checkout
       - install-awscli-windows
       - setenv-target-workflow
-      - setenv-target-branch-revision
       - install-log-collector-windows
       - fetch-job-artifacts:
           filter: "commit-date"
           job: build-windows_amd64
-          destination: target
-      - setenv-commit-date
+      - fetch-job-artifacts:
+          filter: "version"
+          job: build-windows_amd64
+      - fetch-job-artifacts:
+          filter: "build-number"
+          job: build-windows_amd64
+      - fetch-job-artifacts:
+          filter: "git-revision"
+          job: build-windows_amd64
+      - fetch-job-artifacts:
+          filter: "git-branch"
+          job: build-windows_amd64
+      - setenv-from-file:
+          variable-name: COMMIT_DATE
+          path: target/commit-date
+      - setenv-from-file:
+          variable-name: SENSU_VERSION
+          path: target/version
+      - setenv-from-file:
+          variable-name: BUILD_NUMBER
+          path: target/build-number
+      - setenv-from-file:
+          variable-name: TARGET_REVISION
+          path: target/git-revision
+      - setenv-from-file:
+          variable-name: TARGET_BRANCH
+          path: target/git-branch
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-windows_386
