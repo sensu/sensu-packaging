@@ -119,10 +119,14 @@ commands:
           name: Download AWSCLIV2
           command: curl -LO https://awscli.amazonaws.com/AWSCLIV2.msi
       - run:
-          name: Add AWSCLIV2 to PATH
+          name: Install AWSCLIV2
           shell: powershell.exe
           command: msiexec.exe /i AWSCLIV2.msi /quiet
-      - run: echo 'export PATH="/c/Program Files/Amazon/AWSCLIV2:$PATH"' >> $BASH_ENV
+      - run:
+          name: Add AWSCLIV2 to PATH
+          command: >
+            echo 'export PATH="/c/Program Files/Amazon/AWSCLIV2:$PATH"'
+            >> $BASH_ENV
   fetch-job-artifacts:
     description: Fetches a job artifacts for a given workflow & job name
     parameters:
