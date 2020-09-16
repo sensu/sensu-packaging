@@ -26,9 +26,8 @@ commands:
     steps:
       - run:
           name: Set << parameters.variable-name >> environment variable
-          command: >
-            echo '<< parameters.variable-name >>="$(cat << parameters.path >>)"'
-            >> $BASH_ENV
+          command: |
+            echo '<< parameters.variable-name >>="$(cat << parameters.path >>)"' >> $BASH_ENV
       - run:
           name: Ensure << parameters.variable-name >> is set
           command: |
@@ -132,6 +131,9 @@ commands:
         type: string
         default: ""
     steps:
+      - run:
+          name: Create << parameters.destination >> directory
+          command: mkdir -pv << parameters.destination >>
       - run:
           name: Fetch artifacts for << parameters.job >>
           command: >
