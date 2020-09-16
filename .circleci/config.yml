@@ -27,7 +27,7 @@ commands:
       - run:
           name: Set << parameters.variable-name >> environment variable
           command: >
-            echo "<< parameters.variable-name >>=$(cat << parameters.path >>)"
+            echo '<< parameters.variable-name >>="$(cat << parameters.path >>)"'
             >> $BASH_ENV
       - run:
           name: Ensure << parameters.variable-name >> is set
@@ -177,7 +177,9 @@ commands:
       - run:
           name: Verify version of << parameters.working_directory >>/<< parameters.binary >>
           working_directory: << parameters.working_directory >>
-          command: ./<< parameters.binary >> version
+          command: >
+            ./<< parameters.binary >> version | grep
+            "${SENSU_VERSION}.${BUILD_NUMBER}+"
   build-msi:
     parameters:
       pkg-name:
