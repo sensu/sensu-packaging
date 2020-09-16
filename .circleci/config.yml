@@ -18,9 +18,10 @@ parameters:
 
 commands:
   create-target-directory:
-    - run:
-        name: Create target directory
-        command: mkdir -pv target
+    steps:
+      - run:
+          name: Create target directory
+          command: mkdir -pv target
   setenv-from-file:
     parameters:
       variable-name:
