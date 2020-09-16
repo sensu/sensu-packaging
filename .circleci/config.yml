@@ -138,7 +138,9 @@ commands:
         default: ""
     steps:
       - run:
-          name: Fetch artifacts for << parameters.job >> with filter << parameters.filter >>
+          name: >
+            Fetch artifacts for << parameters.job >> with filter:
+            << parameters.filter >>
           command: >
             ./scripts/circleci-fetch-artifacts.sh << parameters.workflow >>
             << parameters.job >> << parameters.destination >>
@@ -409,7 +411,7 @@ jobs:
       - run:
           name: Run CMake
           working_directory: ../obj
-          command: cmake $CIRCLE_WORKING_DIRECTORY
+          command: env && cmake $CIRCLE_WORKING_DIRECTORY
       - run:
           name: Build templates
           working_directory: ../obj
