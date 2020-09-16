@@ -31,7 +31,7 @@ commands:
     steps:
       - run:
           name: Set << parameters.variable-name >> environment variable
-          command: |
+          command: >
             echo "<< parameters.variable-name >>=$(cat << parameters.path >>
             | tr -d '\n')" >> $BASH_ENV
       - run:
