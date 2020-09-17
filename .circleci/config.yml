@@ -69,7 +69,7 @@ commands:
                 environment:
                   BASE_URL: https://circleci.com/api/v1.1/project
                   SLUG: gh/sensu/sensu-enterprise-go
-                  QUERY_PARAMS: ?filter=successful
+                  QUERY_PARAMS: \?filter\=successful
                 command: >
                   curl -fsSLo builds.json -H "Circle-Token: $CIRCLE_TOKEN"
                   $BASE_URL/$SLUG/tree/<< parameters.branch >>$QUERY_PARAMS
