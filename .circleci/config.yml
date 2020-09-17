@@ -69,13 +69,14 @@ commands:
                 environment:
                   BASE_URL: https://circleci.com/api/v1.1/project
                   SLUG: gh/sensu/sensu-enterprise-go
-                  QUERY_PARAMS: \?filter\=successful
+                  QUERY_PARAMS: ?filter=successful
                 command: >
                   curl -fsSLo builds.json -H "Circle-Token: $CIRCLE_TOKEN"
                   $BASE_URL/$SLUG/tree/<< parameters.branch >>$QUERY_PARAMS
             - run:
                 name: Set TARGET_WORKFLOW environment variable
                 command: |
+                  jq '{name: .[].workflows.workflow_name, status: .[].status, id: .[].workflows.workflow_id}' builds.json
                   workflow=$(jq -r \
                   '[.[] | select(.workflows.workflow_name != "nightly")][0]
                   .workflows.workflow_id' \
