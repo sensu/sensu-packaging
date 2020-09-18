@@ -62,7 +62,7 @@ while true; do
         wNextPageToken=""
         wPage=1
 
-        printf %s "$pipelineID" | xxd
+        printf %s "$pipelineID" | xxd >&2
         exit 1
         
         while true; do
