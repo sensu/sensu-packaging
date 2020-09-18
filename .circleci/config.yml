@@ -67,8 +67,8 @@ commands:
             - run:
                 name: Find target workflow for << parameters.branch >> branch
                 command: >
-                  echo "export
-                  TARGET_WORKFLOW=$(./scripts/find-branch-workflow.sh)" >>
+                  echo 'export
+                  TARGET_WORKFLOW="$(./scripts/find-branch-workflow.sh)"' >>
                   $BASH_ENV
       - run:
           name: Ensure TARGET_WORKFLOW is set
@@ -77,6 +77,9 @@ commands:
             echo "TARGET_WORKFLOW is empty"
             exit 1
             fi
+      - run:
+          name: Print TARGET_WORKFLOW
+          command: echo $TARGET_WORKFLOW
   linux-amd64-only:
     parameters:
       target:
