@@ -6,12 +6,12 @@ circleToken="${CIRCLE_TOKEN:-}"
 targetBranch="${TARGET_BRANCH:-}"
 
 if [ "x${circleToken}" = "x" ]; then
-    echo "CIRCLE_TOKEN must be set"
+    echo "CIRCLE_TOKEN must be set" >&2
     exit 1
 fi
 
 if [ "x${targetBranch}" = "x" ]; then
-    echo "TARGET_BRANCH must be set"
+    echo "TARGET_BRANCH must be set" >&2
     exit 1
 fi
 
@@ -102,7 +102,7 @@ while true; do
 done
 
 if [ "x${targetWorkflow}" = "x" ]; then
-    echo "no workflow was found for branch: ${targetBranch}"
+    echo "no workflow was found for branch: ${targetBranch}" >&2
     exit 1
 fi
 

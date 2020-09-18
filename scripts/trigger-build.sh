@@ -10,12 +10,12 @@ branch="${BRANCH:-main}"
 publish="${PUBLISH:-true}"
 
 if [ "x${circleToken}" = "x" ]; then
-    echo "CIRCLE_TOKEN must be set"
+    echo "CIRCLE_TOKEN must be set" >&2
     exit 1
 fi
 
 if [ "x${targetWorkflow}" = "x" ] && [ "x${targetBranch}" = "x" ]; then
-    echo "TARGET_WORKFLOW or TARGET_BRANCH must be set"
+    echo "TARGET_WORKFLOW or TARGET_BRANCH must be set" >&2
     exit 1
 fi
 
