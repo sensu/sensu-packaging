@@ -73,7 +73,7 @@ while true; do
             echo "pipelineID: ${pipelineID}" >&2
             echo "wQueryParams: ${wQueryParams}" >&2
 
-            workflowsURL=$apiURL'/pipeline/'$pipelineID'/workflow?'$wQueryParams
+            workflowsURL="${apiURL}/pipeline/fake-pipeline-id/workflow?${wQueryParams}"
             if ! [ "x${debug}" = "x" ]; then
                 #echo "fetching workflows for pipeline: ${pipelineID}, page: ${wPage}" >&2
                 echo "url: ${workflowsURL}" >&2
