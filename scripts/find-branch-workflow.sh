@@ -59,11 +59,9 @@ while true; do
 
     pipelineIDs=$(echo $createdPipelines | jq -r '.[].id')
     for pipelineID in $pipelineIDs; do
+        pipelineID=${pipelineID%$'\r'} # strip CR because windows...
         wNextPageToken=""
         wPage=1
-
-        printf %s "$pipelineID" | xxd >&2
-        exit 1
         
         while true; do
             wQueryParams=""
