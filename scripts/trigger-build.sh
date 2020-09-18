@@ -29,7 +29,7 @@ fi
 
 jsonBody='{"branch":"'$branch'","parameters":{'
 jsonBody+='"target_workflow":"'$targetWorkflow'",'
-jsonBody+='"publish":'$publish'}'
+jsonBody+='"publish":'$publish
 jsonBody+='}}'
 
 extraOpts="-fsS"
