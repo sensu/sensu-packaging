@@ -31,14 +31,13 @@ while true; do
     if [ "${debug}" = "1" ]; then
         echo "fetching pipelines for branch: ${targetBranch}, page: ${page}"
     fi
-    pipelines=$(curl -fsSL -H "Circle-Token: $circleToken" \
-        $apiURL/project/$slug/pipeline?$queryParams | \
-        jq -r '.')
 
-    ((page++))
-
+    pipelinesURL="${apiURL}/project/${slug}/pipeline?${queryParams}"
+    pipelines=$(curl -fsSL -H "Circle-Token: $circleToken" $pipelinesURL)
     nextPageToken=$(echo $pipelines | jq -r .next_page_token)
     items=$(echo $pipelines | jq -r '.items')
+
+    ((page++))
 
     if [ "x${items}" = "x[]" ]; then
         if [ "${nextPageToken}" = "null" ]; then
@@ -63,21 +62,21 @@ while true; do
         wPage=1
 
         while true; do
-            queryParams=""
+            wQueryParams=""
 
             if ! [ "x${wNextPageToken}" = "x" ]; then
-                queryParams+="page-token=${wNextPageToken}"
+                wQueryParams+="page-token=${wNextPageToken}"
             fi
 
             if [ "${debug}" = "1" ]; then
                 echo "fetching workflows for pipeline: ${pipelineID}, page: ${wPage}"
             fi
-            workflows=$(curl -fsSL -H "Circle-Token: $circleToken" \
-                $apiURL/pipeline/$pipelineID/workflow?wQueryParams)
 
+            workflowsURL="${apiURL}/pipeline/${pipelineID}/workflow?${wQueryParams}"
+            workflows=$(curl -fsSL -H "Circle-Token: $circleToken" $workflowsURL)
+            wNextPageToken=$(echo $workflows | jq -r .next_page_token)
             ((wPage++))
 
-            wNextPageToken=$(echo $workflows | jq -r .next_page_token)
             buildWorkflows=$(echo $workflows | jq -r \
                 '[.items[] | select(.name == "build") |
                     select(.status == "success")]')
