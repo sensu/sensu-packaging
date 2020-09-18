@@ -68,6 +68,7 @@ commands:
                 name: Find target workflow for << parameters.branch >> branch
                 environment:
                   TARGET_BRANCH: << parameters.branch >>
+                  DEBUG: 1
                 command: |
                   ./scripts/find-branch-workflow.sh > workflow
                   echo 'export TARGET_WORKFLOW="'$(cat workflow)'"' >> $BASH_ENV
