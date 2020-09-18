@@ -65,23 +65,11 @@ commands:
             not: << pipeline.parameters.target_workflow >>
           steps:
             - run:
-                name: Fetch successful jobs for << parameters.branch >> branch
-                environment:
-                  BASE_URL: https://circleci.com/api/v1.1/project
-                  SLUG: gh/sensu/sensu-enterprise-go
-                  QUERY_PARAMS: ?filter=successful
+                name: Find target workflow for << parameters.branch >> branch
                 command: >
-                  curl -fsSLo builds.json -H "Circle-Token: $CIRCLE_TOKEN"
-                  $BASE_URL/$SLUG/tree/<< parameters.branch >>$QUERY_PARAMS
-            - run:
-                name: Set TARGET_WORKFLOW environment variable
-                command: |
-                  jq '{name: .[].workflows.workflow_name, status: .[].status, id: .[].workflows.workflow_id}' builds.json
-                  workflow=$(jq -r \
-                  '[.[] | select(.workflows.workflow_name != "nightly")][0]
-                  .workflows.workflow_id' \
-                  builds.json)
-                  echo "export TARGET_WORKFLOW=$workflow" >> $BASH_ENV
+                  echo "export
+                  TARGET_WORKFLOW=$(./scripts/find-branch-workflow.sh)" >>
+                  $BASH_ENV
       - run:
           name: Ensure TARGET_WORKFLOW is set
           command: |

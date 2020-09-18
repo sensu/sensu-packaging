@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+debug="${DEBUG:-0}"
+scriptsPath=$(dirname ${BASH_SOURCE[0]})
 circleToken="${CIRCLE_TOKEN:-}"
 targetWorkflow="${TARGET_WORKFLOW:-}"
 targetBranch="${TARGET_BRANCH:-}"
@@ -13,18 +15,16 @@ if [ "x${circleToken}" = "x" ]; then
 fi
 
 if [ "x${targetWorkflow}" = "x" ] && [ "x${targetBranch}" = "x" ]; then
-    echo "either TARGET_WORKFLOW or TARGET_BRANCH must be set"
+    echo "TARGET_WORKFLOW or TARGET_BRANCH must be set"
     exit 1
 fi
 
 if [ "x${targetWorkflow}" = "x" ]; then
-    baseURL='https://circleci.com/api/v1.1/project/gh/sensu/sensu-enterprise-go'
-    targetWorkflow=$(curl -fsSL \
-        -H 'Accept: application/json' \
-        -H "Circle-Token: ${circleToken}" \
-        ${baseURL}/tree/${targetBranch}?filter=successful | jq -r \
-        '[.[] | select(.workflows.workflow_name != "nightly")]
-        [0].workflows.workflow_id')
+    export CIRCLE_TOKEN=${circleToken}
+    export TARGET_BRANCH=${targetBranch}
+
+    targetWorkflow=$(${scriptsPath}/find-branch-workflow.sh)
+    echo "triggering build for target workflow: ${targetWorkflow}"
 fi
 
 jsonBody='{"branch":"'$branch'","parameters":{'
@@ -32,7 +32,13 @@ jsonBody+='"target_workflow":"'$targetWorkflow'",'
 jsonBody+='"publish":'$publish'}'
 jsonBody+='}}'
 
-curl -vL -X POST \
+extraOpts="-fsS"
+if [ "${debug}" = "1" ]; then
+    extraOpts="-v"
+fi
+
+curl -L -X POST \
+    $extraOpts \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
     -H "Circle-Token: ${circleToken}" \
