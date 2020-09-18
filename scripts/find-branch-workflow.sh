@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-debug="${DEBUG:-0}"
+debug="${DEBUG:-}"
 circleToken="${CIRCLE_TOKEN:-}"
 targetBranch="${TARGET_BRANCH:-}"
 
@@ -29,9 +29,9 @@ while true; do
     fi
 
     pipelinesURL="${apiURL}/project/${slug}/pipeline?${queryParams}"
-    if [ "${debug}" = "1" ]; then
-        echo "fetching pipelines for branch: ${targetBranch}, page: ${page}"
-        echo "url: ${pipelinesURL}"
+    if ! [ "x${debug}" = "x" ]; then
+        echo "fetching pipelines for branch: ${targetBranch}, page: ${page}" >&2
+        echo "url: ${pipelinesURL}" >&2
     fi
 
     pipelines=$(curl -fsSL -H "Circle-Token: $circleToken" $pipelinesURL)
@@ -70,9 +70,9 @@ while true; do
             fi
 
             workflowsURL="${apiURL}/pipeline/${pipelineID}/workflow?${wQueryParams}"
-            if [ "${debug}" = "1" ]; then
-                echo "fetching workflows for pipeline: ${pipelineID}, page: ${wPage}"
-                echo "url: ${workflowsURL}"
+            if ! [ "x${debug}" = "x" ]; then
+                echo "fetching workflows for pipeline: ${pipelineID}, page: ${wPage}" >&2
+                echo "url: ${workflowsURL}" >&2
             fi
 
             workflows=$(curl -fsSL -H "Circle-Token: $circleToken" $workflowsURL)
@@ -107,8 +107,8 @@ if [ "x${targetWorkflow}" = "x" ]; then
     exit 1
 fi
 
-if [ "${debug}" = "1" ]; then
-    echo "found workflow: ${targetWorkflow} for branch: ${targetBranch}"
+if ! [ "x${debug}" = "x" ]; then
+    echo "found workflow: ${targetWorkflow} for branch: ${targetBranch}" >&2
 else
     echo $targetWorkflow
 fi
