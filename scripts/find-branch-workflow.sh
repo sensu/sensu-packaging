@@ -62,8 +62,6 @@ while true; do
         wNextPageToken=""
         wPage=1
 
-        echo "pipeline id: ${pipelineID}" >&2
-
         while true; do
             wQueryParams=""
 
@@ -71,9 +69,11 @@ while true; do
                 wQueryParams+="page-token=${wNextPageToken}"
             fi
 
-            workflowsURL="${apiURL}/pipeline/${pipelineID}/workflow?${wQueryParams}"
-            echo "url: ${workflowsURL}" >&2
+            echo "apiURL: ${apiURL}" >&2
+            echo "pipelineID: ${pipelineID}" >&2
+            echo "wQueryParams: ${wQueryParams}" >&2
 
+            workflowsURL="${apiURL}/pipeline/${pipelineID}/workflow?${wQueryParams}"
             if ! [ "x${debug}" = "x" ]; then
                 echo "fetching workflows for pipeline: ${pipelineID}, page: ${wPage}" >&2
                 echo "url: ${workflowsURL}" >&2
