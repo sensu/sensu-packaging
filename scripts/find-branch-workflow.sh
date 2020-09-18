@@ -62,6 +62,8 @@ while true; do
         wNextPageToken=""
         wPage=1
 
+        echo "pipeline id: ${pipelineID}" >&2
+
         while true; do
             wQueryParams=""
 
@@ -70,6 +72,8 @@ while true; do
             fi
 
             workflowsURL="${apiURL}/pipeline/${pipelineID}/workflow?${wQueryParams}"
+            echo "url: ${workflowsURL}" >&2
+
             if ! [ "x${debug}" = "x" ]; then
                 echo "fetching workflows for pipeline: ${pipelineID}, page: ${wPage}" >&2
                 echo "url: ${workflowsURL}" >&2
@@ -77,6 +81,7 @@ while true; do
 
             workflows=$(curl -fsSL -H "Circle-Token: $circleToken" $workflowsURL)
             wNextPageToken=$(echo $workflows | jq -r .next_page_token)
+
             ((wPage++))
 
             buildWorkflows=$(echo $workflows | jq -r \
