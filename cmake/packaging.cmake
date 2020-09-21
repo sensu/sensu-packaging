@@ -103,7 +103,7 @@ endfunction()
 # Create a CPack test package target
 function(create_cpack_test_package_target _sensu_pkg_name)
     if(${PACKAGE_FILE_EXTENSION} STREQUAL "rpm")
-        set(_test_snapshots_path "packaging/test_snapshots/${PACKAGE_SHORT_NAME}/rpm")
+        set(_test_snapshots_path "${CMAKE_BINARY_DIR}/tests/snapshots/${PACKAGE_SHORT_NAME}/rpm")
 
         # dump manifest
         set(_manifest_path "${_sensu_pkg_name}-manifest")
@@ -145,7 +145,7 @@ function(create_cpack_test_package_target _sensu_pkg_name)
             VERBATIM)
         add_sensu_pkg_test(${_scripts_diff_path})
     elseif(${PACKAGE_FILE_EXTENSION} STREQUAL "deb")
-        set(_test_snapshots_path "packaging/test_snapshots/${PACKAGE_SHORT_NAME}/deb")
+        set(_test_snapshots_path "${CMAKE_BINARY_DIR}/tests/snapshots/${PACKAGE_SHORT_NAME}/deb")
 
         # dump manifest
         set(_manifest_path "${_sensu_pkg_name}-manifest")

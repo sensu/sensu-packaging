@@ -52,7 +52,7 @@ endfunction()
 
 # Set/Override CPACK_RPM settings for agent packages
 function(set_sensu_agent_rpm_overrides)
-    set(agent_rpm_hooks_path "${CMAKE_BINARY_DIR}/packaging/hooks/sensu-agent/rpm")
+    set(agent_rpm_hooks_path "${CMAKE_BINARY_DIR}/hooks/sensu-agent/rpm")
     setg(CPACK_RPM_PRE_INSTALL_SCRIPT_FILE "${agent_rpm_hooks_path}/before-install")
     setg(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${agent_rpm_hooks_path}/after-install")
     setg(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${agent_rpm_hooks_path}/before-remove")
@@ -63,7 +63,7 @@ endfunction()
 function(set_sensu_agent_deb_overrides)
     # Create a new list for package control extras
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "")
-    set(agent_deb_hooks_path "${CMAKE_BINARY_DIR}/packaging/hooks/sensu-agent/deb")
+    set(agent_deb_hooks_path "${CMAKE_BINARY_DIR}/hooks/sensu-agent/deb")
     list(APPEND CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${agent_deb_hooks_path}/preinst")
     list(APPEND CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${agent_deb_hooks_path}/postinst")
     list(APPEND CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${agent_deb_hooks_path}/prerm")

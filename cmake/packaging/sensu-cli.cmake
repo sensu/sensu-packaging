@@ -52,7 +52,7 @@ endfunction()
 
 # Set/Override CPACK_RPM settings for cli packages
 function(set_sensu_cli_rpm_overrides)
-    set(cli_rpm_hooks_path "${CMAKE_BINARY_DIR}/packaging/hooks/sensu-cli/rpm")
+    set(cli_rpm_hooks_path "${CMAKE_BINARY_DIR}/hooks/sensu-cli/rpm")
     setg(CPACK_RPM_PRE_INSTALL_SCRIPT_FILE "${cli_rpm_hooks_path}/before-install")
     setg(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${cli_rpm_hooks_path}/after-install")
     setg(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${cli_rpm_hooks_path}/before-remove")
@@ -63,7 +63,7 @@ endfunction()
 function(set_sensu_cli_deb_overrides)
     # Create a new list for package control extras
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "")
-    set(cli_deb_hooks_path "${CMAKE_BINARY_DIR}/packaging/hooks/sensu-cli/deb")
+    set(cli_deb_hooks_path "${CMAKE_BINARY_DIR}/hooks/sensu-cli/deb")
     list(APPEND CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${cli_deb_hooks_path}/preinst")
     list(APPEND CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${cli_deb_hooks_path}/postinst")
     list(APPEND CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${cli_deb_hooks_path}/prerm")
