@@ -16,9 +16,9 @@ populate the [build parameters](#build-parameters) and trigger a build for the
 * AppVeyor NuGet Project Feed
 
 ## Local Builds
-Builds triggered by commits to this repository. Packages produced by local
-builds will not be published to S3, packagecloud, or AppVeyor but will be
-published as CircleCI artifacts.
+Local builds are builds which are triggered by commits to this repository.
+Packages produced by local builds will not be published to S3, packagecloud, or
+AppVeyor but will be published as CircleCI artifacts.
 
 ## Manually Triggered Builds
 Builds can be triggered using the `scripts/trigger-build.sh` script for a given
@@ -72,39 +72,6 @@ artifacts from each of the required jobs in the remote workflow.
 When value is set to an empty string the `circleci-fetch-artifacts.sh` script
 uses the workflow id of the latest successful build for the master branch in
 `sensu-enterprise-go`.
-
-### sensu_version
-
-**Type:** `string`
-**Default:** `6.0.0`
-
-The version of the local or remote build. This is used to set the version number
-of the package.
-
-### build_number
-
-**Type:** `integer`
-**Default:** `<< pipeline.number >>`
-
-The build number of the local or remote build. This is used to set the revision
-number of the package.
-
-### commit_date
-
-**Type:** `string`
-**Default:** `""`
-
-The date of the commit for the local or remote build. This is used to help
-generate the S3 path which is used to store packages & logs.
-
-When value is set to an empty string the `post-packages-s3.sh` script uses the
-output of:
-
-```sh
-git log -1 --format='%cd' --date=format:'%Y%m%d-%H%M' HEAD
-```
-
-from the local branch.
 
 #### publish
 
