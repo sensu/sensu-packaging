@@ -15,15 +15,15 @@
   <!-- GUIDs -->
 
   <!-- Platform bitness-specific variables -->
-  <?if $(sys.BUILDARCH)="x64" ?>
+  <?if $(var.Platform)="x64" ?>
   <?define Win64="yes" ?>
   <?define PlatformProgramFilesFolder="ProgramFiles64Folder" ?>
   <?define sensuctlExeSourcePath="$(var.ProjectDir)\target\windows_amd64\sensuctl.exe" ?>
-  <?elseif $(sys.BUILDARCH)="x86" ?>
+  <?elseif $(var.Platform)="x86" ?>
   <?define Win64="no" ?>
   <?define PlatformProgramFilesFolder="ProgramFilesFolder" ?>
   <?define sensuctlExeSourcePath="$(var.ProjectDir)\target\windows_386\sensuctl.exe" ?>
   <?else ?>
-  <?error Unsupported value of sys.BUILDARCH=$(sys.BUILDARCH)?>
+  <?error Unsupported value of var.Platform=$(var.Platform)?>
   <?endif ?>
 </Include>
