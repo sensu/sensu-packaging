@@ -2,9 +2,10 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@1.3.0
+  awscli-windows: amdprophet/awscli-windows@dev:first
   cmake: amdprophet/cmake@dev:first
   docker: circleci/docker@1.4.0
-  signtool: amdprophet/signtool@dev:sixth
+  signtool: amdprophet/signtool@dev:seventh
   windows: circleci/windows@2.4.0
   wixtoolset: amdprophet/wixtoolset@dev:third
 
@@ -106,20 +107,6 @@ commands:
               - equal: [<< parameters.target >>, "linux_arm64"]
               - equal: [<< parameters.target >>, "linux_ppc64le"]
           steps: << parameters.steps >>
-  install-awscli-windows:
-    steps:
-      - run:
-          name: Download AWSCLIV2
-          command: curl -LO https://awscli.amazonaws.com/AWSCLIV2.msi
-      - run:
-          name: Install AWSCLIV2
-          shell: powershell.exe
-          command: msiexec.exe /i AWSCLIV2.msi /quiet
-      - run:
-          name: Add AWSCLIV2 to PATH
-          command: >
-            echo 'export PATH="/c/Program Files/Amazon/AWSCLIV2:$PATH"'
-            >> $BASH_ENV
   fetch-job-artifacts:
     description: Fetches a job artifacts for a given workflow & job name
     parameters:
@@ -232,17 +219,8 @@ commands:
             ./<< parameters.binary >> version | grep "${SENSU_VERSION}+"
   build-msi:
     parameters:
-      pkg-name:
-        description: Name of the package.
+      working_directory:
         type: string
-      dist-path:
-        description: Relative path to the MSI dist directory (UNIX-style).
-        type: string
-        default: 'dist/msi'
-      wix-path:
-        description: Relative path to the Project's WiX directory (UNIX-style).
-        type: string
-        default: 'wix'
       arch:
         description: The architecture of the MSI package to build.
         type: string
@@ -250,7 +228,7 @@ commands:
     steps:
       - run:
           name: Create MSI packages for << parameters.arch >> platform
-          working_directory: << parameters.wix-path >>/<< parameters.pkg-name >>
+          working_directory: << parameters.working_directory >>
           command: msbuild.exe -property:Platform=<< parameters.arch >>
   packagecloudgo:
     steps:
@@ -337,12 +315,6 @@ commands:
         type: string
         default: "/tmp/artifacts/s3"
     steps:
-      - run:
-          name: Print AWS path
-          command: which aws
-      - run:
-          name: Print AWS version
-          command: aws --version
       - run:
           name: Upload artifacts to Amazon S3
           environment:
@@ -463,7 +435,7 @@ jobs:
         type: string
     steps:
       - checkout
-      - install-awscli-windows
+      - awscli-windows/download-and-install
       - install-msbuildtasks
       - create-target-directory
       - setenv-target-workflow
@@ -508,17 +480,18 @@ jobs:
           working_directory: target/windows_amd64
           file: << parameters.binary >>
       - build-msi:
-          pkg-name: << parameters.package_name >>
+          working_directory: wix/<< parameters.package_name >>
           arch: x86
       - build-msi:
-          pkg-name: << parameters.package_name >>
+          working_directory: wix/<< parameters.package_name >>
           arch: x64
       - signtool/sign:
           working_directory: dist/msi/en-US
           file: '*.msi'
       - run:
           name: Copy << parameters.package_name >> MSIs to choco tools
-          command: cp dist/msi/en-US/*.msi choco/<< parameters.package_name >>/tools
+          command: |
+            cp dist/msi/en-US/*.msi choco/<< parameters.package_name >>/tools
       - run:
           name: Create choco package for << parameters.package_name >>
           working_directory: choco/<< parameters.package_name >>
