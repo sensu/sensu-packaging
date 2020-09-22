@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>sensu-agent</id>
-    <version>REPLACEVERSION</version>
+    <id>sensu-cli</id>
+    <version>${ProductVersion}</version>
     <owners>Sensu Engineering</owners>
-    <title>sensu-agent (Install)</title>
+    <title>sensu-cli (Install)</title>
     <authors>Sensu Inc</authors>
     <projectUrl>https://github.com/sensu/sensu-go</projectUrl>
     <copyright>2019 Sensu, Inc.</copyright>
@@ -14,9 +14,9 @@
     <docsUrl>https://docs.sensu.io/sensu-go/latest</docsUrl>
     <mailingListUrl>https://discourse.sensu.io/</mailingListUrl>
     <bugTrackerUrl>https://github.com/sensu/sensu-go/issues</bugTrackerUrl>
-    <tags>sensu-agent sensu agent go sensu-go monitor monitoring metric metrics</tags>
-    <summary>The official Sensu Go agent</summary>
-    <description>The Sensu agent is a lightweight Sensu Go client that runs on the infrastructure components you want to monitor.</description>
+    <tags>sensu-cli sensu cli go sensu-go sensuctl ctl monitor monitoring metric metrics</tags>
+    <summary>The official Sensu CLI tools</summary>
+    <description>Sensu CLI tools command-line tools to work with Sensu Go (e.g. sensuctl).</description>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

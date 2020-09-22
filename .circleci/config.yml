@@ -179,6 +179,12 @@ commands:
       - setenv-from-file:
           variable-name: TARGET_BRANCH
           path: target/git-branch
+  install-msbuildtasks:
+    description: Installs MSBuildTasks from Chocolatey
+    steps:
+      - run:
+          name: Install MSBuild.Tasks
+          command: choco.exe install -y MSBuild.Tasks
   extract-tarballs:
     description: Extracts all tarballs in a given directory
     parameters:
@@ -458,6 +464,7 @@ jobs:
     steps:
       - checkout
       - install-awscli-windows
+      - install-msbuildtasks
       - create-target-directory
       - setenv-target-workflow
       - setup-metadata:
@@ -513,21 +520,9 @@ jobs:
           name: Copy << parameters.package_name >> MSIs to choco tools
           command: cp dist/msi/en-US/*.msi choco/<< parameters.package_name >>/tools
       - run:
-          name: Set version & build number in << parameters.package_name >> nuspec
-          working_directory: choco/<< parameters.package_name >>
-          command: sed -i "s/REPLACEVERSION/${SENSU_VERSION}.${BUILD_NUMBER}/g" *.nuspec
-      - run:
-          name: Set checksum32 & checksum64 in choco VERIFICATION.txt
-          working_directory: choco/<< parameters.package_name >>/tools
-          command: |
-            checksum32="$(sha256sum *x86.msi | awk '{print $1}')"
-            checksum64="$(sha256sum *x64.msi | awk '{print $1}')"
-            sed -i "s/REPLACECHECKSUM32/${checksum32}/g" VERIFICATION.txt
-            sed -i "s/REPLACECHECKSUM64/${checksum64}/g" VERIFICATION.txt
-      - run:
           name: Create choco package for << parameters.package_name >>
           working_directory: choco/<< parameters.package_name >>
-          command: choco.exe pack
+          command: msbuild.exe
       - gather-artifacts:
           find_command: "/bin/find"
           filename: "*.msi"

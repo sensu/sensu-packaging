@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <SensuVersion>$(SENSU_VERSION)</SensuVersion>
+        <BuildNumber>$(BUILD_NUMBER)</BuildNumber>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ProductVersion>$(SensuVersion).$(BuildNumber)</ProductVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Installer32 Include="$(MSBuildThisFileDirectory)\tools\*.x86.msi" />
+        <Installer64 Include="$(MSBuildThisFileDirectory)\tools\*.x64.msi" />
+    </ItemGroup>
+    <ItemGroup>
+        <Tokens Include="ProductVersion">
+            <ReplacementValue>$(ProductVersion)</ReplacementValue>
+        </Tokens>
+    </ItemGroup>
+
+    <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+
+    <Target Name="Build">
+        <Error Text="The environment variable SENSU_VERSION must be set."
+               Condition=" '$(SensuVersion)' == ''" />
+        <Error Text="The environment variable BUILD_NUMBER must be set."
+               Condition=" '$(BuildNumber)' == ''" />
+
+        <GetFileHash Files="@(Installer32)">
+        <Output
+            TaskParameter="Hash"
+            PropertyName="Checksum32" />
+        <Output
+            TaskParameter="Items"
+            ItemName="Installer32WithHashes" />
+        </GetFileHash>
+        <Message Importance="High"
+            Text="@(Installer32WithHashes->'%(Identity): %(FileHash)')" />
+
+        <GetFileHash Files="@(Installer64)">
+        <Output
+            TaskParameter="Hash"
+            PropertyName="Checksum64" />
+        <Output
+            TaskParameter="Items"
+            ItemName="Installer64WithHashes" />
+        </GetFileHash>
+        <Message Importance="High"
+            Text="@(Installer64WithHashes->'%(Identity): %(FileHash)')" />
+
+        <ItemGroup>
+            <Tokens Include="Checksum32">
+                <ReplacementValue>$(Checksum32)</ReplacementValue>
+            </Tokens>
+            <Tokens Include="Checksum64">
+                <ReplacementValue>$(Checksum64)</ReplacementValue>
+            </Tokens>
+        </ItemGroup>
+
+        <TemplateFile Template="nuspec.template" OutputFilename="sensu-go-cli.nuspec" Tokens="@(Tokens)" />
+        <TemplateFile Template="VERIFICATION.template" OutputFilename="tools/VERIFICATION.TXT" Tokens="@(Tokens)" />
+        <Exec Command="choco pack" />
+    </Target>
+</Project>
