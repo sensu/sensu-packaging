@@ -508,11 +508,11 @@ jobs:
           pkg-name: << parameters.package_name >>
           arch: x64
       - signtool/sign:
-          working_directory: dist/msi
+          working_directory: dist/msi/en-US
           file: '*.msi'
       - run:
           name: Copy << parameters.package_name >> MSIs to choco tools
-          command: cp dist/msi/*.msi choco/<< parameters.package_name >>/tools
+          command: cp dist/msi/en-US/*.msi choco/<< parameters.package_name >>/tools
       - run:
           name: Set version & build number in << parameters.package_name >> nuspec
           working_directory: choco/<< parameters.package_name >>
