@@ -42,7 +42,7 @@
             Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets')" />
 
     <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true'">
-        <Error Text="The WiX Toolset v3 build tools must be installed to build this project.">
+        <Error Text="The WiX Toolset v3 build tools must be installed to build this project." />
     </Target>
 
     <Target Name="BeforeBuild">
