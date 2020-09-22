@@ -184,7 +184,7 @@ commands:
     steps:
       - run:
           name: Install MSBuild.CommunityTasks
-          command: choco.exe install -y MSBuild.Tasks
+          command: choco.exe install -y MSBuild.CommunityTasks
   extract-tarballs:
     description: Extracts all tarballs in a given directory
     parameters:
