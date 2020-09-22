@@ -6,7 +6,7 @@ orbs:
   docker: circleci/docker@1.4.0
   signtool: amdprophet/signtool@dev:sixth
   windows: circleci/windows@2.4.0
-  wixtoolset: amdprophet/wixtoolset@dev:first
+  wixtoolset: amdprophet/wixtoolset@dev:second
 
 parameters:
   target_workflow:
