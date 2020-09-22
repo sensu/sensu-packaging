@@ -242,26 +242,10 @@ commands:
         type: string
         default: x64
     steps:
-      - run:
-          name: Prepare environment variables for WiX
-          command: |
-            echo 'export PKG_DIST_PATH=$PWD/<< parameters.dist-path >>' >> $BASH_ENV
-            echo 'export WIX_PATH="${PWD}/<< parameters.wix-path >>/<< parameters.pkg-name >>"' >> $BASH_ENV
-            echo 'export PKG_VERSION="${SENSU_VERSION}.${BUILD_NUMBER}"' >> $BASH_ENV
-            echo 'export MSI_NAME=<< parameters.pkg-name >>_${PKG_VERSION}_en-US.<< parameters.arch >>.msi' >> $BASH_ENV
-            echo 'export MSI_PATH=${PKG_DIST_PATH}/${MSI_NAME}' >> $BASH_ENV
-            echo 'export PROJ_DIR=$(cygpath -w ${PWD})' >> $BASH_ENV
       - run: |
           mkdir -pv $PKG_DIST_PATH
           cd $WIX_PATH
-          candle.exe -arch "<< parameters.arch >>" *.wxs -ext WixUtilExtension \
-            -dProjectDir="$PROJ_DIR" \
-            -dVersionNumber="${PKG_VERSION}"
-      - run: |
-          cd $WIX_PATH
-          light.exe -nologo -dcl:high -ext WixUiExtension \
-            -ext WixUtilExtension *.wixobj -cultures:en-us \
-            -loc Product_en-us.wxl -spdb -o "$(cygpath -w ${MSI_PATH})"
+          msbuild.exe -property:Platform=<< parameters.arch >>
   packagecloudgo:
     steps:
       - run:

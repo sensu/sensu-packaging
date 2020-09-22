@@ -1,0 +1,52 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectDir>$([System.IO.Path]::GetFullPath('..\..'))</ProjectDir>
+        <DefineSolutionProperties>false</DefineSolutionProperties>
+        <SchemaVersion>2.0</SchemaVersion>
+        <Cultures>en-US</Cultures>
+        <OutputType>Package</OutputType>
+        <OutputPath>$([System.IO.Path]::GetFullPath('..\..\dist\msi'))</OutputPath>
+        <IntermediateOutputPath>obj</IntermediateOutputPath>
+        <PackageBaseName>sensu-go-cli</PackageBaseName>
+        <SensuVersion>$(SENSU_VERSION)</SensuVersion>
+        <BuildNumber>$(BUILD_NUMBER)</BuildNumber>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ProductVersion>$(SensuVersion).$(BuildNumber)</ProductVersion>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputName>$(PackageBaseName)_$(ProductVersion)_en-US.$(Platform)</OutputName>
+        <DefineConstants>$(DefineConstants);ProductVersion=$(ProductVersion)</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Product.en-US.wxl" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="WixUI_HK.wxs" />
+        <Compile Include="Product.wxs" />
+    </ItemGroup>
+    <ItemGroup>
+        <WixExtension Include="WixUtilExtension">
+            <HintPath>$(WixExtDir)WixUtilExtension.dll</HintPath>
+            <Name>WixUtilExtension</Name>
+        </WixExtension>
+        <WixExtension Include="WixUIExtension">
+            <HintPath>$(WixExtDir)WixUIExtension.dll</HintPath>
+            <Name>WixUIExtension</Name>
+        </WixExtension>
+    </ItemGroup>
+
+    <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != ''" />
+    <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets"
+            Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets')" />
+
+    <Target Name="BeforeBuild">
+        <Error Text="The WiX Toolset v3 build tools must be installed to build this project."
+            Condition=" '$(WixTargetsImported)' != 'true'" />
+        <Error Text="The environment variable SENSU_VERSION must be set."
+            Condition=" '$(SensuVersion)' == ''" />
+        <Error Text="The environment variable BUILD_NUMBER must be set."
+            Condition=" '$(BuildNumber)' == ''" />
+    </Target>
+</Project>
