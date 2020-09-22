@@ -242,10 +242,10 @@ commands:
         type: string
         default: x64
     steps:
-      - run: |
-          mkdir -pv << parameters.dist-path >>
-          cd $WIX_PATH
-          msbuild.exe -property:Platform=<< parameters.arch >>
+      - run:
+          name: Create MSI packages for << parameters.arch >> platform
+          working_directory: << parameters.wix-path >>/<< parameters.pkg-name >>
+          command: msbuild.exe -property:Platform=<< parameters.arch >>
   packagecloudgo:
     steps:
       - run:
