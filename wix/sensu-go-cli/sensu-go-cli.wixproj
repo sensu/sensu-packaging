@@ -41,9 +41,11 @@
     <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets"
             Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets')" />
 
+    <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true'">
+        <Error Text="The WiX Toolset v3 build tools must be installed to build this project.">
+    </Target>
+
     <Target Name="BeforeBuild">
-        <Error Text="The WiX Toolset v3 build tools must be installed to build this project."
-            Condition=" '$(WixTargetsImported)' != 'true'" />
         <Error Text="The environment variable SENSU_VERSION must be set."
             Condition=" '$(SensuVersion)' == ''" />
         <Error Text="The environment variable BUILD_NUMBER must be set."

@@ -483,7 +483,8 @@ jobs:
       - verify-binary:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
-      - wixtoolset/install
+      - wixtoolset/install:
+          cache-key: "justin-test"
       - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
       - run: unzip secure-file.zip
       - run:
