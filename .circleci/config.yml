@@ -183,7 +183,7 @@ commands:
     description: Installs MSBuildTasks from Chocolatey
     steps:
       - run:
-          name: Install MSBuild.Tasks
+          name: Install MSBuild.CommunityTasks
           command: choco.exe install -y MSBuild.Tasks
   extract-tarballs:
     description: Extracts all tarballs in a given directory
