@@ -6,7 +6,7 @@
         <Cultures>en-US</Cultures>
         <OutputType>Package</OutputType>
         <OutputPath>$([System.IO.Path]::GetFullPath('..\..\dist\msi'))</OutputPath>
-        <IntermediateOutputPath>obj</IntermediateOutputPath>
+        <IntermediateOutputPath>obj\$(Platform)</IntermediateOutputPath>
         <PackageBaseName>sensu-go-agent</PackageBaseName>
         <SensuVersion>$(SENSU_VERSION)</SensuVersion>
         <BuildNumber>$(BUILD_NUMBER)</BuildNumber>
