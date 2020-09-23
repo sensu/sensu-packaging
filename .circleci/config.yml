@@ -7,7 +7,7 @@ orbs:
   docker: circleci/docker@1.4.0
   signtool: sensu/signtool@dev:first
   windows: circleci/windows@2.4.0
-  wixtoolset: sensu/wixtoolset@dev:third
+  wixtoolset: sensu/wixtoolset@dev:first
 
 parameters:
   target_workflow:
