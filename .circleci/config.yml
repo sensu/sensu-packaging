@@ -329,6 +329,9 @@ jobs:
   build-linux-packages:
     docker:
       - image: cimg/python:3.8
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
     parameters:
       target:
         type: string
