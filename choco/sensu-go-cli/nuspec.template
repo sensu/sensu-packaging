@@ -10,7 +10,7 @@
     <copyright>2019 Sensu, Inc.</copyright>
     <licenseUrl>https://sensu.io/sensu-license</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <projectSourceUrl>https://github.com/sensu/sensu-enterprise-go</projectSourceUrl>
+    <projectSourceUrl>https://github.com/sensu/sensu-go</projectSourceUrl>
     <docsUrl>https://docs.sensu.io/sensu-go/latest</docsUrl>
     <mailingListUrl>https://discourse.sensu.io/</mailingListUrl>
     <bugTrackerUrl>https://github.com/sensu/sensu-go/issues</bugTrackerUrl>
