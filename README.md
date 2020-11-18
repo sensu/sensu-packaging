@@ -81,5 +81,11 @@ uses the workflow id of the latest successful build for the main branch in
 Whether or not to publish packages to the package repository providers (S3,
 packagecloud, AppVeyor).
 
+## NuGet Feed
+
+The AppVeyor NuGet feed that we publish Sensu NuGet packages to can be viewed at:
+https://ci.appveyor.com/nuget/sensu-hjg205j7fvg1/packages. Use the AppVeyor
+credentials found in 1Password when prompted.
+
 [1]: https://github.com/sensu/sensu-enterprise-go
 [2]: https://app.circleci.com/pipelines/github/sensu/sensu-enterprise-go
