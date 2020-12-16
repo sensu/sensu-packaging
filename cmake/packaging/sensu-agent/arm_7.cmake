@@ -2,7 +2,21 @@
 # Sensu Agent RPM for linux/arm_7
 ##
 function(build_sensu_agent_linux_arm_7_rpm_package)
-    # no-op for now
+    set(PACKAGE_ARCH "armv7hl")
+    set(GOARM "7")
+    set(GOARCH "arm_${GOARM}")
+
+    set(PACKAGECLOUD_DISTROS
+        "fedora/30"
+        "fedora/31"
+        "fedora/32")
+
+    set_common_settings()
+    set_sensu_agent_settings()
+    set_common_rpm_settings()
+    set_sensu_agent_rpm_overrides()
+
+    build_cpack_config()
 endfunction()
 
 ##
