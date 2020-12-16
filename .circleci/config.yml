@@ -555,7 +555,7 @@ workflows:
                 - linux_arm_7
                 - linux_mips_hardfloat
                 - linux_mipsle_hardfloat
-                #- linux_mips64le_hardfloat
+                - linux_mips64le_hardfloat
                 - linux_ppc64le
                 - linux_s390x
       - build-windows-packages:
