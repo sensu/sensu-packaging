@@ -8,7 +8,10 @@ function(build_sensu_agent_linux_amd64_rpm_package)
     set(PACKAGECLOUD_DISTROS
         "el/6"
         "el/7"
-        "el/8")
+        "el/8"
+        "fedora/30"
+        "fedora/31"
+        "fedora/32")
 
     set_common_settings()
     set_sensu_agent_settings()
