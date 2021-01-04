@@ -2,12 +2,12 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@1.3.0
-  awscli-windows: sensu/awscli-windows@dev:second
-  cmake: sensu/cmake@dev:second
+  awscli-windows: sensu/awscli-windows@1.0.0
+  cmake: sensu/cmake@1.0.0
   docker: circleci/docker@1.4.0
-  signtool: sensu/signtool@dev:second
+  signtool: sensu/signtool@1.0.0
   windows: circleci/windows@2.4.0
-  wixtoolset: sensu/wixtoolset@dev:second
+  wixtoolset: sensu/wixtoolset@1.0.0
 
 parameters:
   target_workflow:
