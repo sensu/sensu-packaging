@@ -14,7 +14,7 @@ export PATH
 
 name=sensu-agent
 program=/usr/sbin/sensu-agent
-args="start"
+args="start -c /etc/sensu/agent.yml"
 pidfile="/var/run/sensu/$name.pid"
 user="sensu"
 group="sensu"

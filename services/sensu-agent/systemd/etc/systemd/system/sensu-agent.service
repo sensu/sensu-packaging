@@ -13,7 +13,7 @@ Group=sensu
 EnvironmentFile=-/etc/default/sensu-agent
 EnvironmentFile=-/etc/sysconfig/sensu-agent
 LimitNOFILE=65535
-ExecStart=/usr/sbin/sensu-agent start
+ExecStart=/usr/sbin/sensu-agent start -c /etc/sensu/agent.yml
 Restart=always
 WorkingDirectory=/
 
