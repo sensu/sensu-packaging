@@ -2,7 +2,6 @@
 Description=The Sensu Agent process.
 After=network-online.target
 Wants=network-online.target
-ConditionPathExists=/etc/sensu/agent.yml
 
 [Service]
 Type=simple
