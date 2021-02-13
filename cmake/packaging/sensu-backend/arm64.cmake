@@ -10,7 +10,8 @@ function(build_sensu_backend_linux_arm64_rpm_package)
         "el/8"
         "fedora/30"
         "fedora/31"
-        "fedora/32")
+        "fedora/32"
+        "fedora/33")
 
     set_common_settings()
     set_sensu_backend_settings()
