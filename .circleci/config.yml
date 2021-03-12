@@ -16,6 +16,17 @@ parameters:
   publish:
     type: boolean
     default: false
+  sensu_release_version:
+    type: string
+    default: fa03bf83bef1df882e5c75dc611a186cb0eae5e0
+
+executors:
+  packagecloud-pruner:
+    docker:
+      - image: sensu/sensu-release:<< pipeline.parameters.sensu_release_version >>-packagecloud-pruner
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
 
 commands:
   create-target-directory:
@@ -537,6 +548,10 @@ jobs:
             - upload-artifacts-to-s3:
                 find_command: "/bin/find"
                 source: "c:/tmp/artifacts/s3"
+  packagecloud-pruner:
+    executor: packagecloud-pruner
+    steps:
+      - run: /tools/packagecloud-pruner
 
 workflows:
   packaging:
@@ -566,3 +581,13 @@ workflows:
           name: windows_cli
           package_name: sensu-go-cli
           binary: sensuctl.exe
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - packagecloud-pruner
