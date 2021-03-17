@@ -551,7 +551,7 @@ jobs:
   packagecloud-pruner:
     executor: packagecloud-pruner
     steps:
-      - run: /tools/packagecloud-pruner
+      - run: /tools/packagecloudpruner
 
 workflows:
   packaging:
