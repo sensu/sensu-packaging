@@ -11,7 +11,8 @@ function(build_sensu_cli_linux_arm64_rpm_package)
         "fedora/30"
         "fedora/31"
         "fedora/32"
-        "fedora/33")
+        "fedora/33"
+        "fedora/34")
 
     set_common_settings()
     set_sensu_cli_settings()
