@@ -484,7 +484,7 @@ jobs:
           shell: powershell.exe
           command: >
             .\secure-file.exe -decrypt codesign-cert.p12.enc
-            -secret $env:DECRYPTION_SECRET -salt $env:DECRYPTION_SALT
+            -secret $env:DECRYPTION_SECRET_2021 -salt $env:DECRYPTION_SALT_2021
       - signtool/import-certificate:
           certificate: codesign-cert.p12
       - signtool/sign:
