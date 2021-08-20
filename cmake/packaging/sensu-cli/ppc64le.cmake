@@ -28,6 +28,7 @@ function(build_sensu_cli_linux_ppc64le_deb_package)
         "ubuntu/xenial"
         "ubuntu/bionic"
         "ubuntu/focal"
+        "ubuntu/hirsute"
         "debian/jessie"
         "debian/stretch"
         "debian/buster")

@@ -34,10 +34,8 @@ function(build_sensu_cli_linux_amd64_deb_package)
         "ubuntu/trusty"
         "ubuntu/xenial"
         "ubuntu/bionic"
-        "ubuntu/cosmic"
-        "ubuntu/disco"
-        "ubuntu/eoan"
         "ubuntu/focal"
+        "ubuntu/hirsute"
         "debian/jessie"
         "debian/stretch"
         "debian/buster")
