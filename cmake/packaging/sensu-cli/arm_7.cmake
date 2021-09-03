@@ -34,6 +34,7 @@ function(build_sensu_cli_linux_arm_7_deb_package)
         "ubuntu/xenial"
         "ubuntu/bionic"
         "ubuntu/focal"
+        "ubuntu/hirsute"
         "debian/jessie"
         "debian/stretch"
         "debian/buster")
