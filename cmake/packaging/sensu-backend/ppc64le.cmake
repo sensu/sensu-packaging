@@ -31,7 +31,8 @@ function(build_sensu_backend_linux_ppc64le_deb_package)
         "ubuntu/hirsute"
         "debian/jessie"
         "debian/stretch"
-        "debian/buster")
+        "debian/buster"
+        "debian/bullseye")
 
     set_common_settings()
     set_sensu_backend_settings()

@@ -32,7 +32,8 @@ function(build_sensu_cli_linux_s390x_deb_package)
         "ubuntu/hirsute"
         "debian/jessie"
         "debian/stretch"
-        "debian/buster")
+        "debian/buster"
+        "debian/bullseye")
 
     set_common_settings()
     set_sensu_cli_settings()
