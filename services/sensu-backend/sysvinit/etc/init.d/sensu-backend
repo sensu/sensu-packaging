@@ -57,8 +57,7 @@ start() {
   # If groups not already defined pull in configured groups for sensu user
   #  See chroot --help for info on groups
   #  must conform to syntax like: 'g1,g2,g3'
-  [ -z "$groups" ] && groups=$(groups $user | cut -d ":" -f2 | tr ' ' "," | tail -c+2)
-
+  [ -z "$groups" ] && groups=$(id --groups --name $user | tr ' ' ',')
 
   # Run the program!
 
