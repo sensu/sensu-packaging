@@ -39,7 +39,8 @@ function(build_sensu_cli_linux_arm64_deb_package)
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
-        "debian/bullseye")
+        "debian/bullseye"
+        "raspbian/bullseye")
 
     set_common_settings()
     set_sensu_cli_settings()
