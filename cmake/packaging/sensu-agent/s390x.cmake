@@ -8,7 +8,8 @@ function(build_sensu_agent_linux_s390x_rpm_package)
     set(PACKAGECLOUD_DISTROS
         "el/6"
         "el/7"
-        "el/8")
+        "el/8"
+        "fedora/35")
 
     set_common_settings()
     set_sensu_agent_settings()
@@ -30,6 +31,7 @@ function(build_sensu_agent_linux_s390x_deb_package)
         "ubuntu/bionic"
         "ubuntu/focal"
         "ubuntu/hirsute"
+        "ubuntu/jammy"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"

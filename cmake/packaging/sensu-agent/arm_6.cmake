@@ -17,7 +17,8 @@ function(build_sensu_agent_linux_arm_6_deb_package)
         "raspbian/wheezy"
         "raspbian/jessie"
         "raspbian/stretch"
-        "raspbian/buster")
+        "raspbian/buster"
+        "raspbian/bullseye")
 
     set_common_settings()
     set_sensu_agent_settings()
