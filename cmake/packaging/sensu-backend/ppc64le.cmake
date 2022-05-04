@@ -6,7 +6,8 @@ function(build_sensu_backend_linux_ppc64le_rpm_package)
     set(GOARCH "ppc64le")
 
     set(PACKAGECLOUD_DISTROS
-        "el/8")
+        "el/8"
+        "fedora/35")
 
     set_common_settings()
     set_sensu_backend_settings()
@@ -29,6 +30,7 @@ function(build_sensu_backend_linux_ppc64le_deb_package)
         "ubuntu/bionic"
         "ubuntu/focal"
         "ubuntu/hirsute"
+        "ubuntu/jammy"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
