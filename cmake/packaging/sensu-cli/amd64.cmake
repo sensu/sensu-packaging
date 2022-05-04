@@ -13,7 +13,8 @@ function(build_sensu_cli_linux_amd64_rpm_package)
         "fedora/31"
         "fedora/32"
         "fedora/33"
-        "fedora/34")
+        "fedora/34"
+        "fedora/35")
 
     set_common_settings()
     set_sensu_cli_settings()
@@ -36,6 +37,7 @@ function(build_sensu_cli_linux_amd64_deb_package)
         "ubuntu/bionic"
         "ubuntu/focal"
         "ubuntu/hirsute"
+        "ubuntu/jammy"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
