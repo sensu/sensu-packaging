@@ -7,7 +7,9 @@ function(build_sensu_backend_linux_ppc64le_rpm_package)
 
     set(PACKAGECLOUD_DISTROS
         "el/8"
-        "fedora/35")
+        "el/9"
+        "fedora/35"
+        "fedora/36")
 
     set_common_settings()
     set_sensu_backend_settings()
