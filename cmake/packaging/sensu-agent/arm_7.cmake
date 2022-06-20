@@ -12,7 +12,8 @@ function(build_sensu_agent_linux_arm_7_rpm_package)
         "fedora/32"
         "fedora/33"
         "fedora/34"
-        "fedora/35")
+        "fedora/35"
+        "fedora/36")
 
     set_common_settings()
     set_sensu_agent_settings()

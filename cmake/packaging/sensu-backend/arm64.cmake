@@ -8,12 +8,14 @@ function(build_sensu_backend_linux_arm64_rpm_package)
     set(PACKAGECLOUD_DISTROS
         "el/7"
         "el/8"
+        "el/9"
         "fedora/30"
         "fedora/31"
         "fedora/32"
         "fedora/33"
         "fedora/34"
-        "fedora/35")
+        "fedora/35"
+        "fedora/36")
 
     set_common_settings()
     set_sensu_backend_settings()

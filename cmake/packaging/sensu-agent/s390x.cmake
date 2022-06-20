@@ -9,7 +9,9 @@ function(build_sensu_agent_linux_s390x_rpm_package)
         "el/6"
         "el/7"
         "el/8"
-        "fedora/35")
+        "el/9"
+        "fedora/35"
+        "fedora/36")
 
     set_common_settings()
     set_sensu_agent_settings()
