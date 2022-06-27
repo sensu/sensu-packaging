@@ -16,7 +16,7 @@ function(build_sensu_agent_linux_amd64_rpm_package)
         "fedora/33"
         "fedora/34"
         "fedora/35"
-        "feodra/36")
+        "fedora/36")
 
     set_common_settings()
     set_sensu_agent_settings()
