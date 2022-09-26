@@ -29,7 +29,6 @@ endfunction()
 # agent runtime directories
 function(add_agent_runtime_dirs)
     set(SENSU_AGENT_RUNTIME_DIRS
-        ${SENSU_AGENT_CACHE_DIR}
         ${SENSU_AGENT_DATA_DIR}
         ${SENSU_LOG_DIR}
         ${SENSU_PID_DIR})
@@ -44,6 +43,12 @@ function(add_agent_runtime_dirs)
     # /etc/sensu needs slightly different permissions...
     install(DIRECTORY
         DESTINATION ${SENSU_CONFIG_DIR}
+        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        COMPONENT ${_component})
+
+    # $SENSU_AGENT_CACHE_DIR also needs slightly different permissions...
+    install(DIRECTORY
+        DESTINATION ${SENSU_AGENT_CACHE_DIR}
         DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         COMPONENT ${_component})
 endfunction()
