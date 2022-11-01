@@ -212,6 +212,13 @@ commands:
               file << parameters.binary >>
               cat << parameters.binary >>
             fi
+  install-system-deps:
+    steps:
+      - run:
+          name: Install file
+          command: |
+            sudo apt-get update && sudo apt-get install -y \
+              file;
   verify-version:
     parameters:
       working_directory:
@@ -364,6 +371,7 @@ jobs:
       - cmake/install
       - install-log-collector-linux
       - aws-cli/install
+      - install-system-deps
       - fetch-job-artifacts:
           filter: ".tar.gz"
           job: build-<< parameters.target >>
