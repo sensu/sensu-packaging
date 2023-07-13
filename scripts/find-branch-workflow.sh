@@ -16,7 +16,7 @@ if [ "x${targetBranch}" = "x" ]; then
 fi
 
 apiURL="https://circleci.com/api/v2"
-slug="gh/sensu/sensu-enterprise-go"
+slug="gh/sensu/sensu-go-extras
 targetWorkflow=""
 nextPageToken=""
 page=1

@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
 # Set project name
-project(sensu-enterprise-go
+project(sensu-go-extras
     LANGUAGES NONE)
 
 # Project options

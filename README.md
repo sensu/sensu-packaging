@@ -5,7 +5,7 @@ This repository contains the code required to build packages (excluding Docker).
 ## Remotely Triggered Builds
 Remotely triggered builds are builds which are triggered by another repository.
 
-When a commit is pushed to the `sensu-enterprise-go` repository, it will
+When a commit is pushed to the `sensu-go-extras` repository, it will
 populate the [build parameters](#build-parameters) and trigger a build for the
 `main` branch in this repository. Packages are then built and uploaded to:
 
@@ -34,15 +34,15 @@ Both `curl` and `jq` must be installed for this script to work.
 Environment Variable | Default Value | Description
 -------------------- | ------------- | -----------
 `CIRCLE_TOKEN` | | Your CircleCI API Token.
-`TARGET_WORKFLOW` | | The CircleCI workflow ID of the [sensu-enterprise-go][2] build to build packages for.
-`TARGET_BRANCH` | | The git branch of [sensu-enterprise-go][1] to build packages for.
+`TARGET_WORKFLOW` | | The CircleCI workflow ID of the [sensu-go-extras][2] build to build packages for.
+`TARGET_BRANCH` | | The git branch of [sensu-go-extras][1] to build packages for.
 `BRANCH` | `main` | The branch of this repository to trigger the CI build with.
 `PUBLISH` | `true` | Controls whether or not the packages will be uploaded to packagecloud, S3, and AppVeyor. Can be set to `true` or `false`.
 
 ### Trigger a build for a workflow
 
 Simply replace `REPLACEME` with the CircleCI workflow ID of the
-[sensu-enterprise-go][2]
+[sensu-go-extras][2]
 build that you would like to package.
 
 ```sh
@@ -52,7 +52,7 @@ TARGET_WORKFLOW="REPLACEME" ./scripts/trigger-build.sh
 ### Trigger a build for a git branch
 
 Simply replace `REPLACEME` with the git branch of the
-[sensu-enterprise-go][1]
+[sensu-go-extras][1]
 build that you would like to package.
 
 ```sh
@@ -71,7 +71,7 @@ artifacts from each of the required jobs in the remote workflow.
 
 When value is set to an empty string the `circleci-fetch-artifacts.sh` script
 uses the workflow id of the latest successful build for the main branch in
-`sensu-enterprise-go`.
+`sensu-go-extras`.
 
 #### publish
 
@@ -87,8 +87,8 @@ The AppVeyor NuGet feed that we publish Sensu NuGet packages to can be viewed at
 https://ci.appveyor.com/nuget/sensu-hjg205j7fvg1/packages. Use the AppVeyor
 credentials found in 1Password when prompted.
 
-[1]: https://github.com/sensu/sensu-enterprise-go
-[2]: https://app.circleci.com/pipelines/github/sensu/sensu-enterprise-go
+[1]: https://github.com/sensu/sensu-go-extras
+[2]: https://app.circleci.com/pipelines/github/sensu/sensu-go-extras
 
 ## Publishing CircleCI Orbs
 
