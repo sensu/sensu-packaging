@@ -31,7 +31,8 @@ function(build_sensu_cli_linux_386_deb_package)
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
-        "debian/bullseye")
+        "debian/bullseye"
+        "debian/bookworm")
 
     set_common_settings()
     set_sensu_cli_settings()
