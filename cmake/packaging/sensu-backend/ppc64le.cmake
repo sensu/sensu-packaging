@@ -41,7 +41,8 @@ function(build_sensu_backend_linux_ppc64le_deb_package)
         "debian/stretch"
         "debian/buster"
         "debian/bullseye"
-        "debian/bookworm")
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_backend_settings()
