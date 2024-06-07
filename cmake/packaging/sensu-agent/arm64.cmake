@@ -43,6 +43,7 @@ function(build_sensu_agent_linux_arm64_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"

@@ -19,7 +19,7 @@ function(build_sensu_agent_linux_arm_6_deb_package)
         "raspbian/stretch"
         "raspbian/buster"
         "raspbian/bullseye"
-        "debian/trixie")
+        "raspbian/bookworm")
 
     set_common_settings()
     set_sensu_agent_settings()

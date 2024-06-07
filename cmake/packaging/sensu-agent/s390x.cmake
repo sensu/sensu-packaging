@@ -38,6 +38,7 @@ function(build_sensu_agent_linux_s390x_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"

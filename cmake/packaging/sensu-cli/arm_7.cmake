@@ -42,6 +42,7 @@ function(build_sensu_cli_linux_arm_7_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
