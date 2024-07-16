@@ -28,10 +28,13 @@ function(build_sensu_agent_linux_386_deb_package)
         "ubuntu/xenial"
         "ubuntu/bionic"
         "ubuntu/focal"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
-        "debian/bullseye")
+        "debian/bullseye"
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_agent_settings()

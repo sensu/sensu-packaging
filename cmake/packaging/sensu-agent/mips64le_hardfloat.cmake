@@ -16,7 +16,9 @@ function(build_sensu_agent_linux_mips64le_hardfloat_deb_package)
     set(PACKAGECLOUD_DISTROS
         "debian/stretch"
         "debian/buster"
-        "debian/bullseye")
+        "debian/bullseye"
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_agent_settings()

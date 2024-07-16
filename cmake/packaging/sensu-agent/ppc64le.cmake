@@ -9,7 +9,11 @@ function(build_sensu_agent_linux_ppc64le_rpm_package)
         "el/8"
         "el/9"
         "fedora/35"
-        "fedora/36")
+        "fedora/36"
+        "fedora/37"
+        "fedora/38"
+        "fedora/39"
+        "fedora/40")
 
     set_common_settings()
     set_sensu_agent_settings()
@@ -33,10 +37,13 @@ function(build_sensu_agent_linux_ppc64le_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
-        "debian/bullseye")
+        "debian/bullseye"
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_agent_settings()
