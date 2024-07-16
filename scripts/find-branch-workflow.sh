@@ -38,6 +38,12 @@ while true; do
     nextPageToken=$(echo $pipelines | jq -r .next_page_token)
     items=$(echo $pipelines | jq -r '.items')
 
+    if ! [ "x${debug}" = "x" ]; then
+        echo "Pipelines: ${pipelines}" >&2
+        echo "Token: ${nextPageToken}" >&2
+        echo "Items: ${items}" >&2
+    fi
+
     ((page++))
 
     if [ "x${items}" = "x[]" ]; then
