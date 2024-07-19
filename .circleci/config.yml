@@ -567,14 +567,11 @@ jobs:
       - verify-binary:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
-      - download-and-install-wixtool-set
+      #- download-and-install-wixtool-set
+      - wixtoolset/download-and-install:
+          installer_url: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
       - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
       - run: unzip secure-file.zip
-      - run:
-          name: directory listing
-          shell: powershell.exe
-          command: >
-            Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin\'
       - run:
           name: Decrypt codesigning certificate
           shell: powershell.exe
@@ -598,6 +595,7 @@ jobs:
           working_directory: wix/<< parameters.package_name >>
           arch: x64
       - signtool/sign:
+          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
           working_directory: dist/msi/en-US
           file: '*.msi'
       - run:
