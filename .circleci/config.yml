@@ -352,7 +352,7 @@ commands:
       installer_url:
         description: The URL of the WiX installer.
         type: string
-        default: https://wixtoolset.org/downloads/v3.14.0.4118/wix314.exe
+        default: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
       destination:
         description: The path to save the installer to.
         type: string
@@ -567,7 +567,6 @@ jobs:
       - verify-binary:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
-      #- wixtoolset/download-and-install
       - download-and-install-wixtool-set
       - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
       - run: unzip secure-file.zip
@@ -654,17 +653,17 @@ workflows:
           matrix:
             parameters:
               target:
-                - linux_386
-                - linux_amd64
-                - linux_arm64
-                - linux_arm_5
-                - linux_arm_6
-                - linux_arm_7
-                - linux_mips_hardfloat
-                - linux_mipsle_hardfloat
+                #- linux_386
+                #- linux_amd64
+                #- linux_arm64
+                #- linux_arm_5
+                #- linux_arm_6
+                #- linux_arm_7
+                #- linux_mips_hardfloat
+                #- linux_mipsle_hardfloat
                 #- linux_mips64le_hardfloat
-                - linux_ppc64le
-                - linux_s390x
+                #- linux_ppc64le
+                #- linux_s390x
       - build-windows-packages:
           name: windows_agent
           package_name: sensu-go-agent
