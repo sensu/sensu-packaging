@@ -342,6 +342,11 @@ commands:
             << parameters.source >>
             $TARGET_BRANCH
             $TARGET_REVISION
+  setup-wixtool-set:
+    steps:
+      - wixtoolset/download:
+          installer_url: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
+      - wixtoolset/install
   download-and-install-wixtool-set:
     steps:
       - download-wixtool-set
@@ -568,8 +573,8 @@ jobs:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
       #- download-and-install-wixtool-set
-      - wixtoolset/download-and-install:
-          installer_url: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
+      #- wixtoolset/download-and-install
+      - setup-wixtool-set
       - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
       - run: unzip secure-file.zip
       - run:
