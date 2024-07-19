@@ -342,7 +342,86 @@ commands:
             << parameters.source >>
             $TARGET_BRANCH
             $TARGET_REVISION
-
+  download-wixtool-set:
+    description: Download the WiX Toolset installer. Supports windows/amd64.
+    parameters:
+      installer_url:
+        description: The URL of the WiX installer.
+        type: string
+        default: https://wixtoolset.org/downloads/v3.14.0.4118/wix314.exe
+      destination:
+        description: The path to save the installer to.
+        type: string
+        default: '$HOME\wix.exe'
+      cache:
+        description: Whether or not to cache the installer.
+        type: boolean
+        default: true
+      cache-key:
+        description: |
+          String to use in cache key. Typically overridden when needed to bust
+          cache.
+        type: string
+        default: "v1"
+    steps:
+      - when:
+          condition:
+            equal: [ << parameters.cache >>, true ]
+          steps:
+            - restore_cache:
+                keys:
+                  - wix-installer-<< parameters.cache-key >>-<< parameters.installer_url >>-{{ arch }}
+      - run:
+          name: Download WiX Toolset
+          shell: powershell.exe
+          command: curl.exe -sSLo wix.exe << parameters.installer_url >>
+      - run:
+          name: Download WiX Toolset
+          shell: powershell.exe
+          command: |
+            If (Test-Path << parameters.destination >> -PathType Leaf) {
+              echo "WiX installer has already been downloaded."
+              exit 0
+            }
+            echo "Downloading the WiX Toolset installer."
+            curl.exe -sSLo << parameters.destination >> << parameters.installer_url >>
+  install-wixtool-set:
+    description: Install the WiX Toolset. Supports windows/amd64.
+    parameters:
+      installer_path:
+        description: The path to the WiX Toolset installer.
+        type: string
+        default: '$HOME\wix.exe'
+      expected_path:
+        description: The path to find the WiX installation in.
+        type: string
+        default: 'c:\Program Files (x86)\WiX Toolset v3.14'
+    steps:
+      - run:
+          name: Add WiX to PATH (powershell.exe)
+          shell: powershell.exe
+          command: |
+            [Environment]::SetEnvironmentVariable("Path", $env:PATH + `
+            ";<< parameters.expected_path >>\bin", "Machine")
+      - run:
+          name: Add WiX to PATH (bash.exe)
+          shell: bash.exe -eo pipefail
+          command: |
+            wix_path="$(cygpath '<< parameters.expected_path >>\bin')"
+            echo "export PATH=\"$PATH:$wix_path\"" >> $BASH_ENV
+      - run:
+          name: Install WiX
+          shell: powershell.exe
+          command: |
+            echo "Installing the WiX Toolset."
+            .\wix.exe /install /quiet /norestart
+      - run:
+          name: Verify WiX installation
+          shell: powershell.exe
+          command: |
+            echo $env:Path
+            ls "<< parameters.expected_path >>\bin"
+            candle.exe -h
 jobs:
   build-linux-packages:
     docker:
@@ -484,7 +563,11 @@ jobs:
       - verify-binary:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
-      - wixtoolset/download-and-install
+      #- wixtoolset/download-and-install
+      - download-and-install-wixtool-set:
+          steps:
+            - download-wixtool-set
+            - install-wixtool-set
       - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
       - run: unzip secure-file.zip
       - run:
