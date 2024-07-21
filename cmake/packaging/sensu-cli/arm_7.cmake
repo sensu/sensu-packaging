@@ -13,7 +13,11 @@ function(build_sensu_cli_linux_arm_7_rpm_package)
         "fedora/33"
         "fedora/34"
         "fedora/35"
-        "fedora/36")
+        "fedora/36"
+        "fedora/37"
+        "fedora/38"
+        "fedora/39"
+        "fedora/40")
 
     set_common_settings()
     set_sensu_cli_settings()
@@ -38,10 +42,13 @@ function(build_sensu_cli_linux_arm_7_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
-        "debian/bullseye")
+        "debian/bullseye"
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_cli_settings()
