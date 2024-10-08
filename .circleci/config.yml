@@ -342,7 +342,11 @@ commands:
             << parameters.source >>
             $TARGET_BRANCH
             $TARGET_REVISION
-
+  setup-wixtool-set:
+    steps:
+      - wixtoolset/download:
+          installer_url: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
+      - wixtoolset/install
 jobs:
   build-linux-packages:
     docker:
@@ -484,7 +488,7 @@ jobs:
       - verify-binary:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
-      - wixtoolset/download-and-install
+      - setup-wixtool-set
       - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
       - run: unzip secure-file.zip
       - run:
@@ -496,9 +500,11 @@ jobs:
       - signtool/import-certificate:
           certificate: codesign-cert.p12
       - signtool/sign:
+          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
           working_directory: target/windows_386
           file: << parameters.binary >>
       - signtool/sign:
+          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
           working_directory: target/windows_amd64
           file: << parameters.binary >>
       - build-msi:
@@ -508,6 +514,7 @@ jobs:
           working_directory: wix/<< parameters.package_name >>
           arch: x64
       - signtool/sign:
+          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
           working_directory: dist/msi/en-US
           file: '*.msi'
       - run:
