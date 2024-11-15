@@ -42,11 +42,13 @@ function(build_sensu_cli_linux_arm_7_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
         "debian/bullseye"
-        "debian/bookworm")
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_cli_settings()

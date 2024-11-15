@@ -18,7 +18,8 @@ function(build_sensu_cli_linux_arm_6_deb_package)
         "raspbian/jessie"
         "raspbian/stretch"
         "raspbian/buster"
-        "raspbian/bullseye")
+        "raspbian/bullseye"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_cli_settings()

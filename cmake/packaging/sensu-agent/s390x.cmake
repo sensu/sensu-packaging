@@ -38,11 +38,13 @@ function(build_sensu_agent_linux_s390x_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
         "debian/bullseye"
-        "debian/bookworm")
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_agent_settings()

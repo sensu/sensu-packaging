@@ -17,7 +17,8 @@ function(build_sensu_cli_linux_mips_hardfloat_deb_package)
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
-        "debian/bookworm")
+        "debian/bookworm"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_cli_settings()
