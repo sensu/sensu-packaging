@@ -43,12 +43,14 @@ function(build_sensu_backend_linux_arm64_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
         "debian/bullseye"
         "debian/bookworm"
-        "raspbian/bullseye")
+        "raspbian/bullseye"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_backend_settings()

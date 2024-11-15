@@ -42,12 +42,14 @@ function(build_sensu_cli_linux_arm64_deb_package)
         "ubuntu/bionic"
         "ubuntu/focal"
         "ubuntu/jammy"
+        "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
         "debian/buster"
         "debian/bullseye"
         "debian/bookworm"
-        "raspbian/bullseye")
+        "raspbian/bullseye"
+        "debian/trixie")
 
     set_common_settings()
     set_sensu_cli_settings()
