@@ -365,10 +365,6 @@ jobs:
       - checkout
       - create-target-directory
       - setenv-target-workflow
-      - run:
-          name: Temporary fix - Get commit date from git
-          command: |
-            echo "export COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y-%m-%dT%H:%M:%SZ)" >> $BASH_ENV
       - setup-metadata:
           target: << parameters.target >>
       - run: sudo apt update
@@ -468,10 +464,6 @@ jobs:
       - awscli-windows/download-and-install
       - install-msbuildtasks
       - create-target-directory
-      - run:
-          name: Temporary fix - Get commit date from git
-          command: |
-            echo "export COMMIT_DATE=$(git show -s --format=%cd --date=format:%Y-%m-%dT%H:%M:%SZ)" >> $BASH_ENV
       - setenv-target-workflow
       - setup-metadata:
           target: windows_amd64
