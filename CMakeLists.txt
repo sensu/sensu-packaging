@@ -15,7 +15,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 # Include version
 include(${CMAKE_SOURCE_DIR}/cmake/version.cmake)
 
-# Validate our objdir .
+# Validate our objdir
 sensu_validate_objdir()
 
 include(${CMAKE_SOURCE_DIR}/cmake/preprocessing.cmake)
