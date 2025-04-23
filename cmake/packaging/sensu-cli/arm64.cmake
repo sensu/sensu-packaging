@@ -19,7 +19,9 @@ function(build_sensu_cli_linux_arm64_rpm_package)
         "fedora/37"
         "fedora/38"
         "fedora/39"
-        "fedora/40")
+        "fedora/40"
+        "amazon/2"
+        "amazon/2023")
 
     set_common_settings()
     set_sensu_cli_settings()
