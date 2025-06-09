@@ -10,6 +10,7 @@ function(build_sensu_cli_linux_amd64_rpm_package)
         "el/7"
         "el/8"
         "el/9"
+        "el/10"
         "fedora/30"
         "fedora/31"
         "fedora/32"
