@@ -503,6 +503,7 @@ jobs:
                   ARTIFACT_PATH="./*.rpm"
                   chmod +x ../project/scripts/sign_rpm.exp
                   ../project/scripts/sign_rpm.exp "$ARTIFACT_PATH"
+                  rpm -K *.rpm
                   make publish-sensu-packages VERBOSE=1
                   ls -ltr
             - fetch-logs
