@@ -1,27 +1,16 @@
 #!/usr/bin/expect -f
 
-# Get the RPM file and passphrase from arguments or environment variables
-set rpm_file [lindex $argv 0]
+set timeout -1
 set passphrase $env(GPG_PASSPHRASE)
-set timeout 20
 
-# --- Sanity Checks ---
-if { $rpm_file == "" } {
-    puts "Error: No RPM filename provided to the script."
-    exit 1
+# Loop over RPM files passed as arguments
+foreach rpm_file $argv {
+    spawn rpmsign --addsign $rpm_file
+    expect {
+        "Enter*" {
+            send "$passphrase\r"
+            exp_continue
+        }
+        eof
+    }
 }
-if { $passphrase == "" } {
-    puts "Error: GPG_PASSPHRASE environment variable is not set."
-    exit 1
-}
-
-# Spawn the rpmsign command
-spawn rpmsign --addsign $rpm_file
-
-# Expect the passphrase prompt and send the passphrase
-expect "Enter pass*"
-send "$passphrase\r"
-
-# Wait for the command to finish
-expect eof
-exit 0
