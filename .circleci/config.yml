@@ -499,12 +499,10 @@ jobs:
                 working_directory: ../obj
                 command: |
                   pwd
-                  ls -ltr
-                  ls -ltr ../
-                  ls -ltr ../../
+                  ls -ltr ../project/
                   ARTIFACT_PATH="./"
-                  chmod +x ../scripts/sign_rpm.exp
-                  ../scripts/sign_rpm.exp "$ARTIFACT_PATH"
+                  chmod +x ../project/scripts/sign_rpm.exp
+                  ../project/scripts/sign_rpm.exp "$ARTIFACT_PATH"
                   make publish-sensu-packages VERBOSE=1
                   ls -ltr
             - fetch-logs
