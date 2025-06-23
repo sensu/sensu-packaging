@@ -500,7 +500,7 @@ jobs:
                 command: |
                   pwd
                   ls -ltr ../project/
-                  ARTIFACT_PATH="./"
+                  ARTIFACT_PATH="./*.rpm"
                   chmod +x ../project/scripts/sign_rpm.exp
                   ../project/scripts/sign_rpm.exp "$ARTIFACT_PATH"
                   make publish-sensu-packages VERBOSE=1
