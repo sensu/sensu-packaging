@@ -500,7 +500,7 @@ jobs:
                 command: |
                   pwd
                   ls -ltr ../project/
-                  ARTIFACT_PATH="./*.rpm"
+                  ARTIFACT_PATH="*.rpm"
                   chmod +x ../project/scripts/sign_rpm.exp
                   ../project/scripts/sign_rpm.exp "$ARTIFACT_PATH"
                   rpm -K *.rpm
