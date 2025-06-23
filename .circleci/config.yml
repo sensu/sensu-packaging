@@ -500,6 +500,7 @@ jobs:
                 command: | 
                   ls -ltr
                   make publish-sensu-packages VERBOSE=1
+                  ls -ltr
             - fetch-logs
             - upload-artifacts-to-s3
   build-windows-packages:
