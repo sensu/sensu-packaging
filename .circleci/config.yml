@@ -497,7 +497,9 @@ jobs:
             - run:
                 name: Publish pack
                 working_directory: ../obj
-                command: make publish-sensu-packages VERBOSE=1
+                command: | 
+                  ls -ltr
+                  make publish-sensu-packages VERBOSE=1
             - fetch-logs
             - upload-artifacts-to-s3
   build-windows-packages:
