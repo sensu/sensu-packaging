@@ -464,6 +464,17 @@ jobs:
           name: Test packages
           working_directory: ../obj
           command: make test-sensu-packages VERBOSE=1
+      - run:
+          name: sign RPM files
+          command: |
+            
+            ARTIFACT_PATH="../obj"
+            find "$ARTIFACT_PATH" -type f \( -name "*.rpm" \) | while read -r file; do
+              echo "Signing: $file"
+              ./scripts/sign_rpm.exp $file
+              rpm -K $file
+            done
+
       - gather-artifacts:
           filename: "*.deb"
           source: "../obj"
