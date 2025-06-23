@@ -470,7 +470,8 @@ jobs:
           name: sign RPM files
           command: |
             
-            ARTIFACT_PATH="../obj/*.rpm"
+            ARTIFACT_PATH="./obj/*.rpm"
+            ls -ltr
             chmod +x ./scripts/sign_rpm.exp
             ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
 
