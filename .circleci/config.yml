@@ -347,6 +347,41 @@ commands:
       - wixtoolset/download:
           installer_url: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
       - wixtoolset/install
+
+  setup-gpg:
+    description: "setup GPG for signing artifacts"
+    steps:
+      - run:
+          name: install GPG and dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y gnupg2
+
+      - run:
+          name: configure GPG
+          command: |
+            mkdir -p ~/.gnupg
+            chmod 700 ~/.gnupg
+            echo "use-agent" >> ~/.gnupg/gpg.conf
+            echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+            echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+            chmod 600 ~/.gnupg/gpg.conf
+            chmod 600 ~/.gnupg/gpg-agent.conf
+      - run:
+          name: Import GPG private key
+          command: |
+            echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --import --yes            
+            gpg-connect-agent reloadagent /bye
+            gpg --list-secret-keys
+
+      - run:
+          name: setup RPM configuration
+          command: |
+            echo "%_gpg_name $GPG_KEY_ID" >> ~/.rpmmacros
+            echo "%_signature gpg" >> ~/.rpmmacros
+            echo "%_gpg_path ~/.gnupg" >> ~/.rpmmacros
+            echo "%__gpg /usr/bin/gpg" >> ~/.rpmmacros
+
 jobs:
   build-linux-packages:
     docker:
@@ -371,6 +406,13 @@ jobs:
       - run:
           name: Install RPM tools
           command: sudo apt install rpm
+      - run:
+          name: Install dpkg sign tool
+          command: sudo apt install dpkg-sig
+      - run:
+          name: Install expect for automation
+          command: sudo apt install expect
+      - setup-gpg
       - packagecloudgo
       - cmake/install
       - install-log-collector-linux
