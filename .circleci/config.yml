@@ -497,8 +497,11 @@ jobs:
             - run:
                 name: Publish pack
                 working_directory: ../obj
-                command: | 
+                command: |
+                  pwd
                   ls -ltr
+                  ls -ltr ../
+                  ls -ltr ../../
                   ARTIFACT_PATH="./"
                   chmod +x ../scripts/sign_rpm.exp
                   ../scripts/sign_rpm.exp "$ARTIFACT_PATH"
