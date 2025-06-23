@@ -385,7 +385,7 @@ commands:
 jobs:
   build-linux-packages:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.13.5
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
@@ -471,7 +471,8 @@ jobs:
             ARTIFACT_PATH="../obj"
             find "$ARTIFACT_PATH" -type f \( -name "*.rpm" \) | while read -r file; do
               echo "Signing: $file"
-              ./scripts/sign_rpm.exp $file
+              ls -ltr ./scripts
+              sudo ./scripts/sign_rpm.exp $file
               rpm -K $file
             done
 
