@@ -470,7 +470,7 @@ jobs:
             
             ARTIFACT_PATH="../obj"
             chmod +x ./scripts/sign_rpm.exp
-            find "$ARTIFACT_PATH" -type f -name "*.rpm" | while read -r rpm_file; do
+            while IFS= read -r -d '' rpm_file; do
               echo "-----------------------------------"
               echo "Signing: $rpm_file"
             
@@ -480,7 +480,7 @@ jobs:
               echo "Verifying signature for $rpm_file..."
               # Use rpm -K to check the signature. The output should include "digests signatures OK"
               rpm -K "$rpm_file"
-            done
+            done < <(find "$ARTIFACT_PATH" -type f -name "*.rpm" -print0)
 
       - gather-artifacts:
           filename: "*.deb"
