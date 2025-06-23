@@ -466,15 +466,6 @@ jobs:
           name: Test packages
           working_directory: ../obj
           command: make test-sensu-packages VERBOSE=1
-      - run:
-          name: sign RPM files
-          command: |
-            
-            ARTIFACT_PATH="./obj/*.rpm"
-            ls -ltr
-            chmod +x ./scripts/sign_rpm.exp
-            ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
-
       - gather-artifacts:
           filename: "*.deb"
           source: "../obj"
@@ -483,6 +474,12 @@ jobs:
           filename: "*.rpm"
           source: "../obj"
           destination: "/tmp/artifacts/s3/build/rpm"
+      - run:
+          name: sign RPM files for S3
+          command: |
+            ARTIFACT_PATH="/tmp/artifacts/s3/build/rpm/*.rpm"
+            chmod +x ./scripts/sign_rpm.exp
+            ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
       - gather-artifacts:
           filename: "*.deb"
           source: "../obj"
@@ -491,6 +488,12 @@ jobs:
           filename: "*.rpm"
           source: "../obj"
           destination: "/tmp/artifacts/circleci"
+      - run:
+          name: sign RPM files for circle
+          command: |
+            ARTIFACT_PATH="/tmp/artifacts/circleci/*.rpm"
+            chmod +x ./scripts/sign_rpm.exp
+            ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
       - store_artifacts:
           path: "/tmp/artifacts/circleci"
           destination: "."
