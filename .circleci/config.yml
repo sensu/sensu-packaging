@@ -469,12 +469,17 @@ jobs:
           command: |
             
             ARTIFACT_PATH="../obj"
-            find "$ARTIFACT_PATH" -type f \( -name "*.rpm" \) | while read -r file; do
-              echo "Signing: $file"
-              ls -ltr ./scripts
-              chmod +x ./scripts/sign_rpm.exp
-              ./scripts/sign_rpm.exp $file
-              rpm -K $file
+            chmod +x ./scripts/sign_rpm.exp
+            find "$ARTIFACT_PATH" -type f -name "*.rpm" | while read -r rpm_file; do
+              echo "-----------------------------------"
+              echo "Signing: $rpm_file"
+            
+              # Execute the expect script, passing the current RPM file as an argument
+              ./scripts/sign_rpm.exp "$rpm_file"
+              
+              echo "Verifying signature for $rpm_file..."
+              # Use rpm -K to check the signature. The output should include "digests signatures OK"
+              rpm -K "$rpm_file"
             done
 
       - gather-artifacts:
