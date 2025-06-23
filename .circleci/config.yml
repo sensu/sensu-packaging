@@ -499,10 +499,9 @@ jobs:
                 working_directory: ../obj
                 command: |
                   pwd
-                  ls -ltr ../project/
-                  ARTIFACT_PATH="*.rpm"
+                  ls -ltr ../project/            
                   chmod +x ../project/scripts/sign_rpm.exp
-                  ../project/scripts/sign_rpm.exp "$ARTIFACT_PATH"
+                  ../project/scripts/sign_rpm.exp *.rpm
                   rpm -K *.rpm
                   make publish-sensu-packages VERBOSE=1
                   ls -ltr
