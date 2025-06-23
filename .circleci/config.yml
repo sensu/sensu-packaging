@@ -466,12 +466,12 @@ jobs:
           name: Test packages
           working_directory: ../obj
           command: make test-sensu-packages VERBOSE=1
-      - run:
-          name: sign RPM files for circle CI
-          command: |
-            ARTIFACT_PATH="/home/circleci/obj/*.rpm"
-            chmod +x ./scripts/sign_rpm.exp
-            ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
+      #- run:
+      #    name: sign RPM files for circle CI
+      #    command: |
+      #      ARTIFACT_PATH="/home/circleci/obj/*.rpm"
+      #      chmod +x ./scripts/sign_rpm.exp
+      #      ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
       - gather-artifacts:
           filename: "*.deb"
           source: "../obj"
@@ -499,6 +499,9 @@ jobs:
                 working_directory: ../obj
                 command: | 
                   ls -ltr
+                  ARTIFACT_PATH="./"
+                  chmod +x ../scripts/sign_rpm.exp
+                  ../scripts/sign_rpm.exp "$ARTIFACT_PATH"
                   make publish-sensu-packages VERBOSE=1
                   ls -ltr
             - fetch-logs
