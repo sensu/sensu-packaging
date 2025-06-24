@@ -498,13 +498,9 @@ jobs:
                 name: Publish pack
                 working_directory: ../obj
                 command: |
-                  pwd
-                  ls -ltr ../project/            
                   chmod +x ../project/scripts/sign_rpm.exp
-                  ../project/scripts/sign_rpm.exp *.rpm
-                  rpm -K *.rpm
+                  ../project/scripts/sign_rpm.exp *.rpm                  
                   make publish-sensu-packages VERBOSE=1
-                  ls -ltr
             - fetch-logs
             - upload-artifacts-to-s3
   build-windows-packages:
