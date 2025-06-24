@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+set passphrase $env(GPG_PASSPHRASE)
+
+# Loop over DEB files passed as arguments
+foreach deb_file $argv {
+    spawn dpkg-sig --sign builder $deb_file
+    expect {
+        "Enter*" {
+            send "$passphrase\r"
+            exp_continue
+        }
+        eof
+    }
+}

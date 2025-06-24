@@ -495,12 +495,21 @@ jobs:
           condition: << pipeline.parameters.publish >>
           steps:
             - run:
-                name: Publish pack
+                name: Sign Artifacts and Publish pack
                 working_directory: ../obj
-                command: |
+                command: |  
+                  
+                  # Sign RPM packages
                   chmod +x ../project/scripts/sign_rpm.exp
-                  ../project/scripts/sign_rpm.exp *.rpm                  
+                  ../project/scripts/sign_rpm.exp *.rpm 
+                  
+                  # Sign Debian packages
+                  chmod +x ../project/scripts/sign_deb.exp
+                  ../project/scripts/sign_deb.exp *.deb  
+                  
+                  # Publish to package cloud
                   make publish-sensu-packages VERBOSE=1
+                  
             - fetch-logs
             - upload-artifacts-to-s3
   build-windows-packages:
