@@ -28,6 +28,8 @@ function(build_sensu_agent_linux_386_deb_package)
         "ubuntu/xenial"
         "ubuntu/bionic"
         "ubuntu/focal"
+        "ubuntu/resolute"
+        "ubuntu/raccoon"
         "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
