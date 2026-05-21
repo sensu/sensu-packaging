@@ -476,6 +476,7 @@ commands:
       keypair_alias:
         description: DigiCert keypair alias
         type: string
+        default: ""
     steps:
       - run:
           name: "Sign artifacts with DigiCert: << parameters.file_path >>"
