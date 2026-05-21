@@ -181,7 +181,38 @@ commands:
     steps:
       - run:
           name: Install MSBuild.CommunityTasks
-          command: choco.exe install -y MSBuild.CommunityTasks
+          command: |
+            if choco list --local-only --exact MSBuild.CommunityTasks | grep -q '^MSBuild.CommunityTasks'; then
+              echo "MSBuild.CommunityTasks is already installed"
+              exit 0
+            fi
+
+            retries=5
+            delay=15
+            attempt=1
+            while [ $attempt -le $retries ]; do
+              echo "Installing MSBuild.CommunityTasks (attempt $attempt/$retries)"
+              choco.exe install -y MSBuild.CommunityTasks
+              status=$?
+              if [ $status -eq 0 ]; then
+                break
+              fi
+
+              if [ $status -eq 1618 ]; then
+                echo "msiexec is busy; retrying in $delay seconds..."
+                sleep $delay
+                attempt=$((attempt + 1))
+                continue
+              fi
+
+              echo "Chocolatey install failed with exit code $status"
+              exit $status
+            done
+
+            if ! choco list --local-only --exact MSBuild.CommunityTasks | grep -q '^MSBuild.CommunityTasks'; then
+              echo "Failed to install MSBuild.CommunityTasks after $retries attempts"
+              exit 1
+            fi
   extract-tarballs:
     description: Extracts all tarballs in a given directory
     parameters:
