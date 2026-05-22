@@ -77,6 +77,9 @@ commands:
             not: << pipeline.parameters.target_workflow >>
           steps:
             - run:
+                name: Set TARGET_BRANCH from CIRCLE_BRANCH
+                command: echo "export TARGET_BRANCH=${CIRCLE_BRANCH}" >> $BASH_ENV
+            - run:
                 name: Find target workflow for << parameters.branch >> branch
                 environment:
                   TARGET_BRANCH: << parameters.branch >>
