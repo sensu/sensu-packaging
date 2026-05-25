@@ -65,11 +65,14 @@ commands:
     steps:
       - run:
           name: Export TARGET_WORKFLOW
-          shell: powershell.exe
           command: |
-            Add-Content $env:BASH_ENV "export TARGET_WORKFLOW=$env:CIRCLE_WORKFLOW_ID"
+            echo "export TARGET_WORKFLOW=${CIRCLE_WORKFLOW_ID:-$CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
 
-            Write-Host "CIRCLE_WORKFLOW_ID=$env:CIRCLE_WORKFLOW_ID"
+            cat $BASH_ENV
+
+            source $BASH_ENV
+
+            echo "TARGET_WORKFLOW=${TARGET_WORKFLOW}"
       - run:
           name: Ensure TARGET_WORKFLOW is set
           command: |
