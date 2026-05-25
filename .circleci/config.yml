@@ -126,6 +126,7 @@ commands:
     parameters:
       workflow:
         type: string
+        default: "$TARGET_WORKFLOW"
       job:
         type: string
       destination:
@@ -581,7 +582,7 @@ jobs:
           destination: target/windows_386
       - fetch-job-artifacts:
           filter: ".tar.gz"
-          job: windows_amd64
+          job: build-windows_amd64
           destination: target/windows_amd64
       - extract-tarballs:
           working_directory: target/windows_386
