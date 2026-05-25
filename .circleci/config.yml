@@ -431,7 +431,7 @@ jobs:
       - create-target-directory
       - setenv-target-workflow
       - setup-metadata:
-          target: << parameters.target >>
+          target: build-<< parameters.target >>
       - run:
           name: Set TARGET_BRANCH from CIRCLE_BRANCH
           command: echo "export TARGET_BRANCH=${CIRCLE_BRANCH}" >> $BASH_ENV
