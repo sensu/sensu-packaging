@@ -184,29 +184,20 @@ commands:
     description: Installs MSBuildTasks from Chocolatey
     steps:
       - run:
-          name: Wait for Windows Installer lock
+          name: Kill existing msiexec processes
           shell: powershell.exe
           command: |
-            $maxRetries = 12
-            $retry = 0
-
-            do {
-              $msi = Get-Process msiexec -ErrorAction SilentlyContinue
-
-              if ($msi) {
-                Write-Host "msiexec is running. Waiting 10 seconds..."
-                Start-Sleep -Seconds 10
-                $retry++
-              }
-
-            } while ($msi -and $retry -lt $maxRetries)
+            $msi = Get-Process msiexec -ErrorAction SilentlyContinue
 
             if ($msi) {
-              Write-Host "ERROR: msiexec is still running after timeout"
-              exit 1
+              Write-Host "Stopping existing msiexec processes..."
+
+              $msi | Stop-Process -Force
+
+              Start-Sleep -Seconds 5
             }
 
-            Write-Host "Windows Installer is free."
+            Write-Host "Continuing installation..."
 
       - run:
           name: Install MSBuild.CommunityTasks
