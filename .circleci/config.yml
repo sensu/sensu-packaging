@@ -124,9 +124,6 @@ commands:
   fetch-job-artifacts:
     description: Fetches a job artifacts for a given workflow & job name
     parameters:
-      workflow:
-        type: string
-        default: "$TARGET_WORKFLOW"
       job:
         type: string
       destination:
@@ -135,15 +132,27 @@ commands:
       filter:
         type: string
         default: ""
+
     steps:
+      - run:
+          name: Print TARGET_WORKFLOW
+          command: echo "TARGET_WORKFLOW=[$TARGET_WORKFLOW]"
+
       - run:
           name: >
             Fetch artifacts for << parameters.job >> with filter:
             << parameters.filter >>
-          command: >
-            ./scripts/circleci-fetch-artifacts.sh << parameters.workflow >>
-            << parameters.job >> << parameters.destination >>
-              << parameters.filter >>
+          command: |
+            if [ -z "$TARGET_WORKFLOW" ]; then
+              echo "ERROR: TARGET_WORKFLOW is empty"
+              exit 1
+            fi
+
+            ./scripts/circleci-fetch-artifacts.sh \
+              "$TARGET_WORKFLOW" \
+              "<< parameters.job >>" \
+              "<< parameters.destination >>" \
+              "<< parameters.filter >>"
   setup-metadata:
     description: Fetches metadata files and sets environment variables
     parameters:
@@ -151,27 +160,22 @@ commands:
         type: string
     steps:
       - fetch-job-artifacts:
-          workflow: $TARGET_WORKFLOW
           filter: "commit-date"
           job: << parameters.job_name >>
 
       - fetch-job-artifacts:
-          workflow: $TARGET_WORKFLOW
           filter: "version"
           job: << parameters.job_name >>
 
       - fetch-job-artifacts:
-          workflow: $TARGET_WORKFLOW
           filter: "build-number"
           job: << parameters.job_name >>
 
       - fetch-job-artifacts:
-          workflow: $TARGET_WORKFLOW
           filter: "git-revision"
           job: << parameters.job_name >>
 
       - fetch-job-artifacts:
-          workflow: $TARGET_WORKFLOW
           filter: "git-branch"
           job: << parameters.job_name >>
 
