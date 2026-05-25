@@ -655,6 +655,11 @@ jobs:
 
             Write-Host "DigiCert certificate sync completed"
       - run:
+          name: Debug extracted Windows 386 files
+          shell: powershell.exe
+          command: |
+            Get-ChildItem -Path target/windows_386 -Recurse
+      - run:
           name: Sign Windows 386 binary with DigiCert
           shell: powershell.exe
           command: |
@@ -689,6 +694,21 @@ jobs:
             }
 
             Write-Host "Successfully signed: $filePath"
+      - run:
+          name: Export metadata variables for PowerShell/MSBuild
+          shell: powershell.exe
+          command: |
+            $version = Get-Content target/version
+            $build = Get-Content target/build-number
+            $revision = Get-Content target/git-revision
+            $branch = Get-Content target/git-branch
+
+            [Environment]::SetEnvironmentVariable("SENSU_VERSION", $version, "Process")
+            [Environment]::SetEnvironmentVariable("BUILD_NUMBER", $build, "Process")
+            [Environment]::SetEnvironmentVariable("TARGET_REVISION", $revision, "Process")
+            [Environment]::SetEnvironmentVariable("TARGET_BRANCH", $branch, "Process")
+
+            Write-Host "SENSU_VERSION=$version"
       - build-msi:
           working_directory: wix/<< parameters.package_name >>
           arch: x86
