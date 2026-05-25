@@ -562,13 +562,23 @@ jobs:
           name: Validate DigiCert environment variables
           shell: powershell.exe
           command: |
-            $required = @('SM_API_KEY','SM_CLIENT_CERT_FILE_B64','SM_CLIENT_CERT_PASSWORD','SM_KEYPAIR_ALIAS')
+            $required = @(
+              'SM_API_KEY',
+              'SM_CLIENT_CERT_FILE_B64',
+              'SM_CLIENT_CERT_PASSWORD',
+              'SM_KEYPAIR_ALIAS'
+            )
+
             foreach ($var in $required) {
-              if ([string]::IsNullOrEmpty($env:$var)) {
+
+              $value = [Environment]::GetEnvironmentVariable($var)
+
+              if ([string]::IsNullOrEmpty($value)) {
                 Write-Host "ERROR: $var is not set"
                 exit 1
               }
             }
+
             Write-Host "All DigiCert env vars are set."
       - run:
           name: Decode and save DigiCert client certificate
