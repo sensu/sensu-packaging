@@ -562,7 +562,7 @@ jobs:
           name: Validate DigiCert environment variables
           shell: powershell.exe
           command: |
-            $required = @('SM_API_KEY','SM_CLIENT_CERT_FILE_B64','SM_CLIENT_CERT_PASSWORD','SM_HOST','SM_KEYPAIR_ALIAS')
+            $required = @('SM_API_KEY','SM_CLIENT_CERT_FILE_B64','SM_CLIENT_CERT_PASSWORD','SM_KEYPAIR_ALIAS')
             foreach ($var in $required) {
               if ([string]::IsNullOrEmpty($env:$var)) {
                 Write-Host "ERROR: $var is not set"
@@ -576,7 +576,7 @@ jobs:
           command: |
             $certContent = $env:SM_CLIENT_CERT_FILE_B64
             $decodedContent = [System.Convert]::FromBase64String($certContent)
-            $certPath = "C:\\Temp\\DigiCert\\certificate.p12"
+            $certPath = "C:\\Temp\\DigiCert\\certificate.pfx"
             New-Item -ItemType Directory -Force -Path "C:\\Temp\\DigiCert" | Out-Null
             [System.IO.File]::WriteAllBytes($certPath, $decodedContent)
             Write-Host "Client certificate saved to: $certPath"
@@ -625,10 +625,25 @@ jobs:
           name: Set up DigiCert env vars for signing
           shell: powershell.exe
           command: |
-            $env:SM_CLIENT_CERT_FILE = "C:\\Temp\\DigiCert\\certificate.p12"
+            $env:SM_CLIENT_CERT_FILE = "C:\\Temp\\DigiCert\\certificate.pfx"
+            $env:SM_CLIENT_CERT_PASSWORD = $env:SM_CLIENT_CERT_PASSWORD
             $env:PKCS11_CONFIG = "C:\\Temp\\DigiCert\\pkcs11properties.cfg"
             $env:PATH = "$env:PATH;C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools"
             Write-Host "DigiCert env vars configured"
+      - run:
+          name: Sync DigiCert certificates
+          shell: powershell.exe
+          command: |
+            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+
+            & $smctlPath windows certsync
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "ERROR: DigiCert certsync failed"
+              exit 1
+            }
+
+            Write-Host "DigiCert certificate sync completed"
       - run:
           name: Sign Windows 386 binary with DigiCert
           shell: powershell.exe
@@ -647,15 +662,22 @@ jobs:
           name: Sign Windows amd64 binary with DigiCert
           shell: powershell.exe
           command: |
-            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+            $smctlPath = "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
             $filePath = "target/windows_amd64/<< parameters.binary >>"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
+
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
-            & $smctlPath sign --keypair-alias="$keypairAlias" --input="$filePath"
+
+            & $smctlPath sign `
+              --keypair-alias="$keypairAlias" `
+              --input="$filePath" `
+              --verbose
+
             if ($LASTEXITCODE -ne 0) {
               Write-Host "ERROR: Signing failed for $filePath"
               exit 1
             }
+
             Write-Host "Successfully signed: $filePath"
       - build-msi:
           working_directory: wix/<< parameters.package_name >>
@@ -667,16 +689,25 @@ jobs:
           name: Sign MSI packages with DigiCert
           shell: powershell.exe
           command: |
-            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
-            $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
+            $smctlPath = "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
+
+            $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
+
             foreach ($msi in $msiFiles) {
+
               Write-Host "Signing $($msi.FullName) with DigiCert KeyLocker..."
-              & $smctlPath sign --keypair-alias="$keypairAlias" --input="$($msi.FullName)"
+
+              & $smctlPath sign `
+                --keypair-alias="$keypairAlias" `
+                --input="$($msi.FullName)" `
+                --verbose
+
               if ($LASTEXITCODE -ne 0) {
                 Write-Host "ERROR: Signing failed for $($msi.FullName)"
                 exit 1
               }
+
               Write-Host "Successfully signed: $($msi.FullName)"
             }
       - run:
