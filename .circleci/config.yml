@@ -822,7 +822,7 @@ workflows:
   packaging:
     jobs:
       - build-linux-packages:
-          name: << matrix.target >>
+          name: build-<< matrix.target >>
           destination: target/<< matrix.target >>
           matrix:
             parameters:
