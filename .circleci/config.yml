@@ -142,7 +142,7 @@ commands:
           command: >
             ./scripts/circleci-fetch-artifacts.sh << parameters.workflow >>
             << parameters.job >> << parameters.destination >>
-            << parameters.filter >>
+              << parameters.filter >>
   setup-metadata:
     description: Fetches metadata files and sets environment variables
     parameters:
@@ -150,32 +150,46 @@ commands:
         type: string
     steps:
       - fetch-job-artifacts:
+          workflow: $TARGET_WORKFLOW
           filter: "commit-date"
           job: << parameters.job_name >>
+
       - fetch-job-artifacts:
+          workflow: $TARGET_WORKFLOW
           filter: "version"
           job: << parameters.job_name >>
+
       - fetch-job-artifacts:
+          workflow: $TARGET_WORKFLOW
           filter: "build-number"
           job: << parameters.job_name >>
+
       - fetch-job-artifacts:
+          workflow: $TARGET_WORKFLOW
           filter: "git-revision"
           job: << parameters.job_name >>
+
       - fetch-job-artifacts:
+          workflow: $TARGET_WORKFLOW
           filter: "git-branch"
           job: << parameters.job_name >>
+
       - setenv-from-file:
           variable-name: COMMIT_DATE
           path: target/commit-date
+
       - setenv-from-file:
           variable-name: SENSU_VERSION
           path: target/version
+
       - setenv-from-file:
           variable-name: BUILD_NUMBER
           path: target/build-number
+
       - setenv-from-file:
           variable-name: TARGET_REVISION
           path: target/git-revision
+
       - setenv-from-file:
           variable-name: TARGET_BRANCH
           path: target/git-branch
