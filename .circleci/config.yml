@@ -559,11 +559,11 @@ jobs:
       - create-target-directory
       - setenv-target-workflow
       - setup-metadata:
-          target: windows_amd64
+          target: build-windows_amd64
       - install-log-collector-windows
       - fetch-job-artifacts:
           filter: ".tar.gz"
-          job: windows_386
+          job: build-windows_386
           destination: target/windows_386
       - fetch-job-artifacts:
           filter: ".tar.gz"
