@@ -50,8 +50,8 @@ while true; do
     createdPipelines=$(echo $pipelines | jq -r \
         '[.items[] | select(.state == "created")]')
 
-    if [ "x${createdPipelines}" = "[]" ]; then
-        if [ "x${nextPageToken}" = "x" ]; then
+    if [ "x${createdPipelines}" = "x[]" ]; then
+        if [ "${nextPageToken}" = "null" ]; then
             break
         fi
         continue
@@ -77,6 +77,8 @@ while true; do
             fi
 
             workflows=$(curl -fsSL -H "Circle-Token: $circleToken" $workflowsURL)
+            echo "WORKFLOWS RESPONSE:" >&2
+            echo "$workflows" | jq -r '.items[] | "\(.id) \(.name) \(.status)"' >&2
             wNextPageToken=$(echo $workflows | jq -r .next_page_token)
 
             ((wPage++))
@@ -84,7 +86,7 @@ while true; do
             buildWorkflows=$(echo "$workflows" | jq -r \
                 '[.items[] | select(.name == "build")]')
 
-            if [ "${buildWorkflows}" = "[]" ]; then
+            if [ "x${buildWorkflows}" = "x[]" ]; then
                 if [ "${wNextPageToken}" = "null" ]; then
                     break
                 fi
