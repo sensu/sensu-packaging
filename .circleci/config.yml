@@ -126,7 +126,6 @@ commands:
     parameters:
       workflow:
         type: string
-        default: "$TARGET_WORKFLOW"
       job:
         type: string
       destination:
@@ -147,24 +146,24 @@ commands:
   setup-metadata:
     description: Fetches metadata files and sets environment variables
     parameters:
-      target:
+      job_name:
         type: string
     steps:
       - fetch-job-artifacts:
           filter: "commit-date"
-          job: build-<< parameters.target >>
+          job: << parameters.job_name >>
       - fetch-job-artifacts:
           filter: "version"
-          job: build-<< parameters.target >>
+          job: << parameters.job_name >>
       - fetch-job-artifacts:
           filter: "build-number"
-          job: build-<< parameters.target >>
+          job: << parameters.job_name >>
       - fetch-job-artifacts:
           filter: "git-revision"
-          job: build-<< parameters.target >>
+          job: << parameters.job_name >>
       - fetch-job-artifacts:
           filter: "git-branch"
-          job: build-<< parameters.target >>
+          job: << parameters.job_name >>
       - setenv-from-file:
           variable-name: COMMIT_DATE
           path: target/commit-date
@@ -564,11 +563,11 @@ jobs:
       - install-log-collector-windows
       - fetch-job-artifacts:
           filter: ".tar.gz"
-          job: build-windows_386
+          job: windows_386
           destination: target/windows_386
       - fetch-job-artifacts:
           filter: ".tar.gz"
-          job: build-windows_amd64
+          job: windows_amd64
           destination: target/windows_amd64
       - extract-tarballs:
           working_directory: target/windows_386
