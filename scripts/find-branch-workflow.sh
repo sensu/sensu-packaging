@@ -16,7 +16,7 @@ if [ "x${targetBranch}" = "x" ]; then
 fi
 
 apiURL="https://circleci.com/api/v2"
-slug="gh/sensu/sensu-enterprise-go"
+slug="gh/sensu/sensu-packaging"
 targetWorkflow=""
 nextPageToken=""
 page=1
@@ -81,9 +81,8 @@ while true; do
 
             ((wPage++))
 
-            buildWorkflows=$(echo $workflows | jq -r \
-                '[.items[] | select(.name == "build") |
-                    select(.status == "success")]')
+            buildWorkflows=$(echo "$workflows" | jq -r \
+                '[.items[] | select(.name == "build")]')
 
             if [ "${buildWorkflows}" = "[]" ]; then
                 if [ "${wNextPageToken}" = "null" ]; then
@@ -92,6 +91,8 @@ while true; do
                 continue
             fi
 
+            echo "AVAILABLE WORKFLOWS:" >&2
+            echo "$buildWorkflows" | jq -r '.[] | "\(.id) \(.status) \(.name)"' >&2
             targetWorkflow=$(echo $buildWorkflows | jq -r '.[0].id')
             break
         done
