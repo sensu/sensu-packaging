@@ -696,19 +696,16 @@ jobs:
             Write-Host "Successfully signed: $filePath"
       - run:
           name: Export metadata variables for PowerShell/MSBuild
-          shell: powershell.exe
+          shell: bash.exe -eo pipefail
           command: |
-            $version = Get-Content target/version
-            $build = Get-Content target/build-number
-            $revision = Get-Content target/git-revision
-            $branch = Get-Content target/git-branch
+            echo "export SENSU_VERSION=$(cat target/version)" >> $BASH_ENV
+            echo "export BUILD_NUMBER=$(cat target/build-number)" >> $BASH_ENV
+            echo "export TARGET_REVISION=$(cat target/git-revision)" >> $BASH_ENV
+            echo "export TARGET_BRANCH=$(cat target/git-branch)" >> $BASH_ENV
 
-            [Environment]::SetEnvironmentVariable("SENSU_VERSION", $version, "Process")
-            [Environment]::SetEnvironmentVariable("BUILD_NUMBER", $build, "Process")
-            [Environment]::SetEnvironmentVariable("TARGET_REVISION", $revision, "Process")
-            [Environment]::SetEnvironmentVariable("TARGET_BRANCH", $branch, "Process")
+            source $BASH_ENV
 
-            Write-Host "SENSU_VERSION=$version"
+            echo "SENSU_VERSION=$SENSU_VERSION"
       - build-msi:
           working_directory: wix/<< parameters.package_name >>
           arch: x86
