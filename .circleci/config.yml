@@ -69,12 +69,17 @@ commands:
             if [ -n "<< pipeline.parameters.target_workflow >>" ]; then
               echo 'export TARGET_WORKFLOW="<< pipeline.parameters.target_workflow >>"' >> $BASH_ENV
             else
+              echo "export TARGET_BRANCH=${CIRCLE_BRANCH}" >> $BASH_ENV
+              source $BASH_ENV
+
               ./scripts/find-branch-workflow.sh > workflow
+
               echo 'export TARGET_WORKFLOW="'$(cat workflow)'"' >> $BASH_ENV
             fi
 
             source $BASH_ENV
 
+            echo "TARGET_BRANCH=${TARGET_BRANCH}"
             echo "TARGET_WORKFLOW=${TARGET_WORKFLOW}"
       - run:
           name: Ensure TARGET_WORKFLOW is set
