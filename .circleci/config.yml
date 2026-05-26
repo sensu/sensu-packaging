@@ -63,26 +63,26 @@ commands:
         type: string
         default: "main"
     steps:
-      - run:
-          name: Export TARGET_WORKFLOW
-          command: |
-            echo "export TARGET_BRANCH=${CIRCLE_BRANCH}" >> $BASH_ENV
-            source $BASH_ENV
-
-            ./scripts/find-branch-workflow.sh > workflow
-
-            TARGET_WORKFLOW=$(cat workflow | tr -d '\n')
-
-            if [ -z "$TARGET_WORKFLOW" ]; then
-              echo "ERROR: No workflow found for branch ${TARGET_BRANCH}"
-              exit 1
-            fi
-
-            echo "export TARGET_WORKFLOW=${TARGET_WORKFLOW}" >> $BASH_ENV
-
-            source $BASH_ENV
-
-            echo "TARGET_WORKFLOW=${TARGET_WORKFLOW}"
+      - when:
+          condition: << pipeline.parameters.target_workflow >>
+          steps:
+            - run:
+                name: Set TARGET_WORKFLOW environment variable
+                command: >
+                  echo 'export
+                  TARGET_WORKFLOW=<< pipeline.parameters.target_workflow >>'
+                  >> $BASH_ENV
+      - when:
+          condition:
+            not: << pipeline.parameters.target_workflow >>
+          steps:
+            - run:
+                name: Find target workflow for << parameters.branch >> branch
+                environment:
+                  TARGET_BRANCH: << parameters.branch >>
+                command: |
+                  ./scripts/find-branch-workflow.sh > workflow
+                  echo 'export TARGET_WORKFLOW="'$(cat workflow)'"' >> $BASH_ENV
       - run:
           name: Ensure TARGET_WORKFLOW is set
           command: |
@@ -121,6 +121,9 @@ commands:
   fetch-job-artifacts:
     description: Fetches a job artifacts for a given workflow & job name
     parameters:
+      workflow:
+        type: string
+        default: "$TARGET_WORKFLOW"
       job:
         type: string
       destination:
@@ -129,69 +132,48 @@ commands:
       filter:
         type: string
         default: ""
-
     steps:
-      - run:
-          name: Print TARGET_WORKFLOW
-          command: echo "TARGET_WORKFLOW=[$TARGET_WORKFLOW]"
-
       - run:
           name: >
             Fetch artifacts for << parameters.job >> with filter:
             << parameters.filter >>
-          command: |
-            if [ -z "$TARGET_WORKFLOW" ]; then
-              echo "ERROR: TARGET_WORKFLOW is empty"
-              exit 1
-            fi
-
-            ./scripts/circleci-fetch-artifacts.sh \
-              "$TARGET_WORKFLOW" \
-              "<< parameters.job >>" \
-              "<< parameters.destination >>" \
-              "<< parameters.filter >>"
+          command: >
+            ./scripts/circleci-fetch-artifacts.sh << parameters.workflow >>
+            << parameters.job >> << parameters.destination >>
+            << parameters.filter >>
   setup-metadata:
     description: Fetches metadata files and sets environment variables
     parameters:
-      job_name:
+      target:
         type: string
     steps:
       - fetch-job-artifacts:
           filter: "commit-date"
-          job: << parameters.job_name >>
-
+          job: build-<< parameters.target >>
       - fetch-job-artifacts:
           filter: "version"
-          job: << parameters.job_name >>
-
+          job: build-<< parameters.target >>
       - fetch-job-artifacts:
           filter: "build-number"
-          job: << parameters.job_name >>
-
+          job: build-<< parameters.target >>
       - fetch-job-artifacts:
           filter: "git-revision"
-          job: << parameters.job_name >>
-
+          job: build-<< parameters.target >>
       - fetch-job-artifacts:
           filter: "git-branch"
-          job: << parameters.job_name >>
-
+          job: build-<< parameters.target >>
       - setenv-from-file:
           variable-name: COMMIT_DATE
           path: target/commit-date
-
       - setenv-from-file:
           variable-name: SENSU_VERSION
           path: target/version
-
       - setenv-from-file:
           variable-name: BUILD_NUMBER
           path: target/build-number
-
       - setenv-from-file:
           variable-name: TARGET_REVISION
           path: target/git-revision
-
       - setenv-from-file:
           variable-name: TARGET_BRANCH
           path: target/git-branch
@@ -213,7 +195,6 @@ commands:
             }
 
             Write-Host "Continuing installation..."
-
       - run:
           name: Install MSBuild.CommunityTasks
           command: choco.exe install -y MSBuild.CommunityTasks
@@ -391,47 +372,10 @@ commands:
       - wixtoolset/download:
           installer_url: https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe
       - wixtoolset/install
-
-  setup-gpg:
-    description: "setup GPG for signing artifacts"
-    steps:
-      - run:
-          name: install GPG and dependencies
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y gnupg2
-
-      - run:
-          name: configure GPG
-          command: |
-            mkdir -p ~/.gnupg
-            chmod 700 ~/.gnupg
-            echo "use-agent" >> ~/.gnupg/gpg.conf
-            echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-            echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-            chmod 600 ~/.gnupg/gpg.conf
-            chmod 600 ~/.gnupg/gpg-agent.conf
-      - run:
-          name: Import GPG private key
-          command: |
-            echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --import --yes            
-            gpg-connect-agent reloadagent /bye
-            gpg --list-secret-keys
-
-      - run:
-          name: setup RPM configuration
-          command: |
-            echo "%_gpg_name $GPG_KEY_ID" >> ~/.rpmmacros
-            echo "%_signature gpg" >> ~/.rpmmacros
-            echo "%_gpg_path ~/.gnupg" >> ~/.rpmmacros
-            echo "%__gpg /usr/bin/gpg" >> ~/.rpmmacros
-            gpgconf --kill gpg-agent || true
-            gpgconf --launch gpg-agent
-
 jobs:
   build-linux-packages:
     docker:
-      - image: cimg/python:3.13.5
+      - image: cimg/python:3.8
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
@@ -447,21 +391,11 @@ jobs:
       - create-target-directory
       - setenv-target-workflow
       - setup-metadata:
-          job_name: build-<< parameters.target >>
-      - run:
-          name: Set TARGET_BRANCH from CIRCLE_BRANCH
-          command: echo "export TARGET_BRANCH=${CIRCLE_BRANCH}" >> $BASH_ENV
+          target: << parameters.target >>
       - run: sudo apt update
       - run:
           name: Install RPM tools
           command: sudo apt install rpm
-      - run:
-          name: Install dpkg sign tool
-          command: sudo apt install dpkg-sig
-      - run:
-          name: Install expect for automation
-          command: sudo apt install expect
-      - setup-gpg
       - packagecloudgo
       - cmake/install
       - install-log-collector-linux
@@ -513,12 +447,6 @@ jobs:
           name: Test packages
           working_directory: ../obj
           command: make test-sensu-packages VERBOSE=1
-      #- run:
-      #    name: sign RPM files for circle CI
-      #    command: |
-      #      ARTIFACT_PATH="/home/circleci/obj/*.rpm"
-      #      chmod +x ./scripts/sign_rpm.exp
-      #      ./scripts/sign_rpm.exp "$ARTIFACT_PATH"
       - gather-artifacts:
           filename: "*.deb"
           source: "../obj"
@@ -542,21 +470,9 @@ jobs:
           condition: << pipeline.parameters.publish >>
           steps:
             - run:
-                name: Sign Artifacts and Publish pack
+                name: Publish pack
                 working_directory: ../obj
-                command: |  
-                  
-                  # Sign RPM packages
-                  chmod +x ../project/scripts/sign_rpm.exp
-                  ../project/scripts/sign_rpm.exp *.rpm 
-                  
-                  # Sign Debian packages
-                  chmod +x ../project/scripts/sign_deb.exp
-                  ../project/scripts/sign_deb.exp *.deb  
-                  
-                  # Publish to package cloud
-                  make publish-sensu-packages VERBOSE=1
-                  
+                command: make publish-sensu-packages VERBOSE=1
             - fetch-logs
             - upload-artifacts-to-s3
   build-windows-packages:
@@ -575,7 +491,7 @@ jobs:
       - create-target-directory
       - setenv-target-workflow
       - setup-metadata:
-          job_name: build-windows_amd64
+          target: windows_amd64
       - install-log-collector-windows
       - fetch-job-artifacts:
           filter: ".tar.gz"
@@ -880,7 +796,7 @@ workflows:
   packaging:
     jobs:
       - build-linux-packages:
-          name: build-<< matrix.target >>
+          name: << matrix.target >>
           destination: target/<< matrix.target >>
           matrix:
             parameters:
