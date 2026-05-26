@@ -16,7 +16,7 @@ if [ "x${targetBranch}" = "x" ]; then
 fi
 
 apiURL="https://circleci.com/api/v2"
-slug="gh/sensu/sensu-packaging"
+slug="gh/sensu/sensu-enterprise-go"
 targetWorkflow=""
 nextPageToken=""
 page=1
@@ -50,8 +50,8 @@ while true; do
     createdPipelines=$(echo $pipelines | jq -r \
         '[.items[] | select(.state == "created")]')
 
-    if [ "x${createdPipelines}" = "x[]" ]; then
-        if [ "${nextPageToken}" = "null" ]; then
+    if [ "x${createdPipelines}" = "[]" ]; then
+        if [ "x${nextPageToken}" = "x" ]; then
             break
         fi
         continue
@@ -77,24 +77,21 @@ while true; do
             fi
 
             workflows=$(curl -fsSL -H "Circle-Token: $circleToken" $workflowsURL)
-            echo "WORKFLOWS RESPONSE:" >&2
-            echo "$workflows" | jq -r '.items[] | "\(.id) \(.name) \(.status)"' >&2
             wNextPageToken=$(echo $workflows | jq -r .next_page_token)
 
             ((wPage++))
 
-            buildWorkflows=$(echo "$workflows" | jq -r \
-                '[.items[] | select(.name == "build")]')
+            buildWorkflows=$(echo $workflows | jq -r \
+                '[.items[] | select(.name == "build") |
+                    select(.status == "success")]')
 
-            if [ "x${buildWorkflows}" = "x[]" ]; then
+            if [ "${buildWorkflows}" = "[]" ]; then
                 if [ "${wNextPageToken}" = "null" ]; then
                     break
                 fi
                 continue
             fi
 
-            echo "AVAILABLE WORKFLOWS:" >&2
-            echo "$buildWorkflows" | jq -r '.[] | "\(.id) \(.status) \(.name)"' >&2
             targetWorkflow=$(echo $buildWorkflows | jq -r '.[0].id')
             break
         done
