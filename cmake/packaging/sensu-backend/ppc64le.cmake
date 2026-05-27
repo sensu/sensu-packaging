@@ -37,6 +37,8 @@ function(build_sensu_backend_linux_ppc64le_deb_package)
         "ubuntu/focal"
         "ubuntu/hirsute"
         "ubuntu/jammy"
+        "ubuntu/resolute"
+        "ubuntu/raccoon"
         "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"

@@ -19,6 +19,9 @@ function(build_sensu_agent_linux_arm_6_deb_package)
         "raspbian/stretch"
         "raspbian/buster"
         "raspbian/bullseye"
+        "ubuntu/resolute"
+        "ubuntu/raccoon"
+        "ubuntu/noble"
         "raspbian/bookworm")
 
     set_common_settings()

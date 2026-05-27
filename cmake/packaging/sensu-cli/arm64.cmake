@@ -45,6 +45,8 @@ function(build_sensu_cli_linux_arm64_deb_package)
         "ubuntu/bionic"
         "ubuntu/focal"
         "ubuntu/jammy"
+        "ubuntu/resolute"
+        "ubuntu/raccoon"
         "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"
