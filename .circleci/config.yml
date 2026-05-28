@@ -212,16 +212,6 @@ commands:
           working_directory: << parameters.working_directory >>
           command: |
             << parameters.find_command >> -name '*.tar.gz' -type f -exec tar -zxf {} \;
-      - run:
-          name: Debug extracted Windows 386 files
-          shell: powershell.exe
-          command: |
-            Get-ChildItem -Path target/windows_386 -Recurse
-      - run:
-          name: Debug extracted Windows amd64 files
-          shell: powershell.exe
-          command: |
-            Get-ChildItem -Path target/windows_amd64 -Recurse
   verify-binary:
     parameters:
       working_directory:
@@ -375,7 +365,7 @@ commands:
 jobs:
   build-linux-packages:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.13.5
         auth:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASSWORD
