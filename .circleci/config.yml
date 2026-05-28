@@ -662,12 +662,18 @@ jobs:
             $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
             $filePath = "target/windows_386/<< parameters.binary >>"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
+
+            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
 
             & $smctlPath sign `
               --keypair-alias "$keypairAlias" `
               --input "$filePath" `
               --tool signtool `
+              --tool-path "$($signtool.Directory.FullName)" `
               --verbose
 
             if ($LASTEXITCODE -ne 0) {
@@ -683,19 +689,23 @@ jobs:
             $filePath = "target/windows_amd64/<< parameters.binary >>"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
 
+            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
 
             & $smctlPath sign `
               --keypair-alias "$keypairAlias" `
               --input "$filePath" `
               --tool signtool `
+              --tool-path "$($signtool.Directory.FullName)" `
               --verbose
 
             if ($LASTEXITCODE -ne 0) {
               Write-Host "ERROR: Signing failed for $filePath"
               exit 1
             }
-
             Write-Host "Successfully signed: $filePath"
       - run:
           name: Export metadata variables for PowerShell/MSBuild
@@ -722,16 +732,20 @@ jobs:
             $smctlPath = "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
 
+            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+
             $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
 
             foreach ($msi in $msiFiles) {
-
               Write-Host "Signing $($msi.FullName) with DigiCert KeyLocker..."
 
               & $smctlPath sign `
                 --keypair-alias "$keypairAlias" `
                 --input "$($msi.FullName)" `
                 --tool signtool `
+                --tool-path "$($signtool.Directory.FullName)" `
                 --verbose
 
               if ($LASTEXITCODE -ne 0) {
