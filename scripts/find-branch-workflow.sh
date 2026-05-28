@@ -82,7 +82,7 @@ while true; do
             ((wPage++))
 
             buildWorkflows=$(echo $workflows | jq -r \
-                '[.items[] | select(.name == "build") |
+                '[.items[] | select(.name == "packaging") |
                     select(.status == "success")]')
 
             if [ "${buildWorkflows}" = "[]" ]; then
