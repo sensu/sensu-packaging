@@ -83,7 +83,7 @@ while true; do
 
             buildWorkflows=$(echo $workflows | jq -r \
                 '[.items[] | select(.name == "packaging") |
-                    select(.status == "success")]')
+                    select(.status == "success" or .status == "running")]')
 
             if [ "${buildWorkflows}" = "[]" ]; then
                 if [ "${wNextPageToken}" = "null" ]; then
