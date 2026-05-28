@@ -82,8 +82,8 @@ while true; do
             ((wPage++))
 
             buildWorkflows=$(echo $workflows | jq -r \
-                '[.items[] | select(.name == "packaging") |
-                    select(.status == "success" or .status == "running")]')
+                '[.items[] | select(.name == "build") |
+                    select(.status == "success")]')
 
             if [ "${buildWorkflows}" = "[]" ]; then
                 if [ "${wNextPageToken}" = "null" ]; then
