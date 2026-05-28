@@ -663,11 +663,19 @@ jobs:
             $filePath = "target/windows_386/<< parameters.binary >>"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
 
+            # Use x64 signtool explicitly
             $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+              Where-Object { $_.FullName -like "*x64*" } |
               Sort-Object FullName -Descending |
               Select-Object -First 1
 
             $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
+
+            # Make DigiCert KSP env vars available to Windows processes
+            $env:SM_CLIENT_CERT_FILE = "C:\Temp\DigiCert\certificate.pfx"
+            $env:SM_CLIENT_CERT_PASSWORD = $env:SM_CLIENT_CERT_PASSWORD
+            $env:SM_HOST = "https://clientauth.one.digicert.com"
+
             Write-Host "signtool path: $($signtool.FullName)"
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
 
