@@ -181,6 +181,21 @@ commands:
     description: Installs MSBuildTasks from Chocolatey
     steps:
       - run:
+          name: Kill existing msiexec processes
+          shell: powershell.exe
+          command: |
+            $msi = Get-Process msiexec -ErrorAction SilentlyContinue
+
+            if ($msi) {
+              Write-Host "Stopping existing msiexec processes..."
+
+              $msi | Stop-Process -Force
+
+              Start-Sleep -Seconds 5
+            }
+
+            Write-Host "Continuing installation..."
+      - run:
           name: Install MSBuild.CommunityTasks
           command: choco.exe install -y MSBuild.CommunityTasks
   extract-tarballs:
@@ -197,6 +212,16 @@ commands:
           working_directory: << parameters.working_directory >>
           command: |
             << parameters.find_command >> -name '*.tar.gz' -type f -exec tar -zxf {} \;
+      - run:
+          name: Debug extracted Windows 386 files
+          shell: powershell.exe
+          command: |
+            Get-ChildItem -Path target/windows_386 -Recurse
+      - run:
+          name: Debug extracted Windows amd64 files
+          shell: powershell.exe
+          command: |
+            Get-ChildItem -Path target/windows_amd64 -Recurse
   verify-binary:
     parameters:
       working_directory:
@@ -489,34 +514,233 @@ jobs:
           working_directory: target/windows_amd64
           binary: << parameters.binary >>
       - setup-wixtool-set
-      - run: curl -LsO https://github.com/appveyor/secure-file/releases/download/1.0.1/secure-file.zip
-      - run: unzip secure-file.zip
+      # DigiCert KeyLocker/Signing Manager integration
       - run:
-          name: Decrypt codesigning certificate
+          name: Validate DigiCert environment variables
           shell: powershell.exe
-          command: >
-            .\secure-file.exe -decrypt codesign-cert.p12.enc
-            -secret $env:DECRYPTION_SECRET_2023 -salt $env:DECRYPTION_SALT_2023
-      - signtool/import-certificate:
-          certificate: codesign-cert.p12
-      - signtool/sign:
-          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
-          working_directory: target/windows_386
-          file: << parameters.binary >>
-      - signtool/sign:
-          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
-          working_directory: target/windows_amd64
-          file: << parameters.binary >>
+          command: |
+            $required = @(
+              'SM_HOST',
+              'SM_API_KEY',
+              'SM_CLIENT_CERT_FILE_B64',
+              'SM_CLIENT_CERT_PASSWORD',
+              'SM_KEYPAIR_ALIAS'
+            )
+
+            foreach ($var in $required) {
+
+              $value = [Environment]::GetEnvironmentVariable($var)
+
+              if ([string]::IsNullOrEmpty($value)) {
+                Write-Host "ERROR: $var is not set"
+                exit 1
+              }
+            }
+
+            Write-Host "All DigiCert env vars are set."
+      - run:
+          name: Decode and save DigiCert client certificate
+          shell: powershell.exe
+          command: |
+            $certContent = $env:SM_CLIENT_CERT_FILE_B64
+            $decodedContent = [System.Convert]::FromBase64String($certContent)
+            $certPath = "C:\\Temp\\DigiCert\\certificate.pfx"
+            New-Item -ItemType Directory -Force -Path "C:\\Temp\\DigiCert" | Out-Null
+            [System.IO.File]::WriteAllBytes($certPath, $decodedContent)
+            Write-Host "Client certificate saved to: $certPath"
+      - run:
+          name: Create PKCS#11 configuration file
+          shell: powershell.exe
+          command: |
+            $pkcs11Config = @"
+            name=signingmanager
+            library=C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smpkcs11.dll
+            slotListIndex=0
+            "@
+            $configPath = "C:\\Temp\\DigiCert\\pkcs11properties.cfg"
+            Set-Content -Path $configPath -Value $pkcs11Config -Encoding ASCII
+            Write-Host "PKCS#11 configuration created at: $configPath"
+      - run:
+          name: Download DigiCert Signing Manager Tools
+          shell: powershell.exe
+          command: |
+            $smToolsUrl = "https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download"
+            $msiPath = "C:\\Temp\\DigiCert\\smtools-windows-x64.msi"
+            Write-Host "Downloading DigiCert tools from: $smToolsUrl"
+            curl.exe -L -H "x-api-key:$env:SM_API_KEY" -o $msiPath $smToolsUrl
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "Failed to download DigiCert tools"
+              exit 1
+            }
+            Write-Host "DigiCert tools downloaded to: $msiPath"
+      - run:
+          name: Install DigiCert Signing Manager Tools
+          shell: powershell.exe
+          command: |
+            $msiPath = "C:\\Temp\\DigiCert\\smtools-windows-x64.msi"
+            Write-Host "Installing DigiCert Signing Manager Tools..."
+            Start-Process msiexec.exe `
+            -ArgumentList "/i `"$msiPath`" /qn /norestart" `
+            -Wait
+            Start-Sleep -Seconds 5
+            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+            if (Test-Path $smctlPath) {
+              Write-Host "DigiCert tools installed successfully"
+              Write-Host "SMCTL location: $smctlPath"
+            } else {
+              Write-Host "ERROR: DigiCert tools installation failed"
+              exit 1
+            }
+      - run:
+          name: Locate signtool.exe
+          shell: powershell.exe
+          command: |
+            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+
+            if (-not $signtool) {
+              Write-Host "ERROR: signtool.exe not found"
+              exit 1
+            }
+
+            Write-Host "Found signtool: $($signtool.FullName)"
+
+            Add-Content $env:BASH_ENV "export PATH=`"$($signtool.Directory.FullName);`$PATH`""
+      - run:
+          name: Wait after DigiCert install
+          shell: powershell.exe
+          command: |
+            Start-Sleep -Seconds 20
+      - run:
+          name: Verify DigiCert installation
+          shell: powershell.exe
+          command: |
+            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+
+            & $smctlPath version
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "ERROR: smctl not working"
+              exit 1
+            }
+
+            Write-Host "DigiCert Signing Manager installed successfully"
+      - run:
+          name: Persist DigiCert environment variables
+          shell: powershell.exe
+          command: |
+            Add-Content $env:BASH_ENV 'export SM_HOST="https://clientauth.one.digicert.com"'
+            Add-Content $env:BASH_ENV 'export SM_CLIENT_CERT_FILE="C:\\Temp\\DigiCert\\certificate.pfx"'
+            Add-Content $env:BASH_ENV 'export PKCS11_CONFIG="C:\\Temp\\DigiCert\\pkcs11properties.cfg"'
+            Add-Content $env:BASH_ENV 'export PATH="$PATH:/c/Program Files/DigiCert/DigiCert One Signing Manager Tools"'
+
+            Write-Host "DigiCert environment variables persisted"
+      - run:
+          name: Sync DigiCert certificates
+          shell: powershell.exe
+          command: |
+            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+
+            & $smctlPath windows certsync --keypair-alias="$env:SM_KEYPAIR_ALIAS"
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "ERROR: DigiCert certsync failed"
+              exit 1
+            }
+
+            Write-Host "DigiCert certificate sync completed"
+      - run:
+          name: Debug extracted Windows 386 files
+          shell: powershell.exe
+          command: |
+            Get-ChildItem -Path target/windows_386 -Recurse
+      - run:
+          name: Sign Windows 386 binary with DigiCert
+          shell: powershell.exe
+          command: |
+            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+            $filePath = "target/windows_386/<< parameters.binary >>"
+            $keypairAlias = $env:SM_KEYPAIR_ALIAS
+            Write-Host "Signing $filePath with DigiCert KeyLocker..."
+
+            & $smctlPath sign `
+              --keypair-alias "$keypairAlias" `
+              --input "$filePath" `
+              --tool signtool `
+              --verbose
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "ERROR: Signing failed for $filePath"
+              exit 1
+            }
+            Write-Host "Successfully signed: $filePath"
+      - run:
+          name: Sign Windows amd64 binary with DigiCert
+          shell: powershell.exe
+          command: |
+            $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
+            $filePath = "target/windows_amd64/<< parameters.binary >>"
+            $keypairAlias = $env:SM_KEYPAIR_ALIAS
+
+            Write-Host "Signing $filePath with DigiCert KeyLocker..."
+
+            & $smctlPath sign `
+              --keypair-alias "$keypairAlias" `
+              --input "$filePath" `
+              --tool signtool `
+              --verbose
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "ERROR: Signing failed for $filePath"
+              exit 1
+            }
+
+            Write-Host "Successfully signed: $filePath"
+      - run:
+          name: Export metadata variables for PowerShell/MSBuild
+          shell: bash.exe -eo pipefail
+          command: |
+            echo "export SENSU_VERSION=$(cat target/version)" >> $BASH_ENV
+            echo "export BUILD_NUMBER=$(cat target/build-number)" >> $BASH_ENV
+            echo "export TARGET_REVISION=$(cat target/git-revision)" >> $BASH_ENV
+            echo "export TARGET_BRANCH=$(cat target/git-branch)" >> $BASH_ENV
+
+            source $BASH_ENV
+
+            echo "SENSU_VERSION=$SENSU_VERSION"
       - build-msi:
           working_directory: wix/<< parameters.package_name >>
           arch: x86
       - build-msi:
           working_directory: wix/<< parameters.package_name >>
           arch: x64
-      - signtool/sign:
-          path: 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe'
-          working_directory: dist/msi/en-US
-          file: '*.msi'
+      - run:
+          name: Sign MSI packages with DigiCert
+          shell: powershell.exe
+          command: |
+            $smctlPath = "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
+            $keypairAlias = $env:SM_KEYPAIR_ALIAS
+
+            $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
+
+            foreach ($msi in $msiFiles) {
+
+              Write-Host "Signing $($msi.FullName) with DigiCert KeyLocker..."
+
+              & $smctlPath sign `
+                --keypair-alias "$keypairAlias" `
+                --input "$($msi.FullName)" `
+                --tool signtool `
+                --verbose
+
+              if ($LASTEXITCODE -ne 0) {
+                Write-Host "ERROR: Signing failed for $($msi.FullName)"
+                exit 1
+              }
+
+              Write-Host "Successfully signed: $($msi.FullName)"
+            }
       - run:
           name: Copy << parameters.package_name >> MSIs to choco tools
           command: |
