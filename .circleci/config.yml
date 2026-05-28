@@ -618,7 +618,7 @@ jobs:
           command: |
             $smctlPath = "C:\\Program Files\\DigiCert\\DigiCert One Signing Manager Tools\\smctl.exe"
 
-            & $smctlPath version
+            & $smctlPath healthcheck
 
             if ($LASTEXITCODE -ne 0) {
               Write-Host "ERROR: smctl not working"
