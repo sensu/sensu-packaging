@@ -667,13 +667,14 @@ jobs:
               Sort-Object FullName -Descending |
               Select-Object -First 1
 
+            $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
+            Write-Host "signtool path: $($signtool.FullName)"
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
 
             & $smctlPath sign `
               --keypair-alias "$keypairAlias" `
               --input "$filePath" `
               --tool signtool `
-              --tool-path "$($signtool.Directory.FullName)" `
               --verbose
 
             if ($LASTEXITCODE -ne 0) {
@@ -693,13 +694,14 @@ jobs:
               Sort-Object FullName -Descending |
               Select-Object -First 1
 
+            $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
+            Write-Host "signtool path: $($signtool.FullName)"
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
 
             & $smctlPath sign `
               --keypair-alias "$keypairAlias" `
               --input "$filePath" `
               --tool signtool `
-              --tool-path "$($signtool.Directory.FullName)" `
               --verbose
 
             if ($LASTEXITCODE -ne 0) {
@@ -736,6 +738,9 @@ jobs:
               Sort-Object FullName -Descending |
               Select-Object -First 1
 
+            $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
+            Write-Host "signtool path: $($signtool.FullName)"
+
             $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
 
             foreach ($msi in $msiFiles) {
@@ -745,7 +750,6 @@ jobs:
                 --keypair-alias "$keypairAlias" `
                 --input "$($msi.FullName)" `
                 --tool signtool `
-                --tool-path "$($signtool.Directory.FullName)" `
                 --verbose
 
               if ($LASTEXITCODE -ne 0) {
