@@ -663,22 +663,20 @@ jobs:
             $filePath = "target/windows_386/<< parameters.binary >>"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
 
-            # Use x64 signtool explicitly
-            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
-              Where-Object { $_.FullName -like "*x64*" } |
-              Sort-Object FullName -Descending |
-              Select-Object -First 1
+            $signtoolDir = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Directory |
+              Where-Object { $_.Name -match "10\." } |
+              Sort-Object Name -Descending |
+              Select-Object -First 1 -ExpandProperty FullName
+            $signtoolPath = Join-Path $signtoolDir "x64\signtool.exe"
+            $env:PATH = "$(Split-Path $signtoolPath);$env:PATH"
+            Write-Host "signtool path: $signtoolPath"
 
-            $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
+            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE", "C:\Temp\DigiCert\certificate.pfx", "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_HOST", "https://clientauth.one.digicert.com", "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_API_KEY", $env:SM_API_KEY, "Process")
 
-            # Make DigiCert KSP env vars available to Windows processes
-            $env:SM_CLIENT_CERT_FILE = "C:\Temp\DigiCert\certificate.pfx"
-            $env:SM_CLIENT_CERT_PASSWORD = $env:SM_CLIENT_CERT_PASSWORD
-            $env:SM_HOST = "https://clientauth.one.digicert.com"
-
-            Write-Host "signtool path: $($signtool.FullName)"
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
-
             & $smctlPath sign `
               --keypair-alias "$keypairAlias" `
               --input "$filePath" `
@@ -698,14 +696,20 @@ jobs:
             $filePath = "target/windows_amd64/<< parameters.binary >>"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
 
-            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
-              Sort-Object FullName -Descending |
-              Select-Object -First 1
+            $signtoolDir = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Directory |
+              Where-Object { $_.Name -match "10\." } |
+              Sort-Object Name -Descending |
+              Select-Object -First 1 -ExpandProperty FullName
+            $signtoolPath = Join-Path $signtoolDir "x64\signtool.exe"
+            $env:PATH = "$(Split-Path $signtoolPath);$env:PATH"
+            Write-Host "signtool path: $signtoolPath"
 
-            $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
-            Write-Host "signtool path: $($signtool.FullName)"
+            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE", "C:\Temp\DigiCert\certificate.pfx", "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_HOST", "https://clientauth.one.digicert.com", "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_API_KEY", $env:SM_API_KEY, "Process")
+
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
-
             & $smctlPath sign `
               --keypair-alias "$keypairAlias" `
               --input "$filePath" `
@@ -742,18 +746,22 @@ jobs:
             $smctlPath = "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
             $keypairAlias = $env:SM_KEYPAIR_ALIAS
 
-            $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
-              Sort-Object FullName -Descending |
-              Select-Object -First 1
+            $signtoolDir = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Directory |
+              Where-Object { $_.Name -match "10\." } |
+              Sort-Object Name -Descending |
+              Select-Object -First 1 -ExpandProperty FullName
+            $signtoolPath = Join-Path $signtoolDir "x64\signtool.exe"
+            $env:PATH = "$(Split-Path $signtoolPath);$env:PATH"
+            Write-Host "signtool path: $signtoolPath"
 
-            $env:PATH = "$($signtool.Directory.FullName);$env:PATH"
-            Write-Host "signtool path: $($signtool.FullName)"
+            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE", "C:\Temp\DigiCert\certificate.pfx", "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_HOST", "https://clientauth.one.digicert.com", "Process")
+            [System.Environment]::SetEnvironmentVariable("SM_API_KEY", $env:SM_API_KEY, "Process")
 
             $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
-
             foreach ($msi in $msiFiles) {
               Write-Host "Signing $($msi.FullName) with DigiCert KeyLocker..."
-
               & $smctlPath sign `
                 --keypair-alias "$keypairAlias" `
                 --input "$($msi.FullName)" `
@@ -764,7 +772,6 @@ jobs:
                 Write-Host "ERROR: Signing failed for $($msi.FullName)"
                 exit 1
               }
-
               Write-Host "Successfully signed: $($msi.FullName)"
             }
       - run:
