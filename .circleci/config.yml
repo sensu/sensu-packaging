@@ -661,10 +661,7 @@ jobs:
             $env:PATH = "$(Split-Path $signtoolPath);$env:PATH"
             Write-Host "signtool path: $signtoolPath"
 
-            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE", "C:\Temp\DigiCert\certificate.pfx", "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_HOST", "https://clientauth.one.digicert.com", "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_API_KEY", $env:SM_API_KEY, "Process")
+            $env:SM_CLIENT_CERT_FILE = "C:\Temp\DigiCert\certificate.pfx"
 
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
             & $smctlPath sign `
@@ -694,10 +691,7 @@ jobs:
             $env:PATH = "$(Split-Path $signtoolPath);$env:PATH"
             Write-Host "signtool path: $signtoolPath"
 
-            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE", "C:\Temp\DigiCert\certificate.pfx", "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_HOST", "https://clientauth.one.digicert.com", "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_API_KEY", $env:SM_API_KEY, "Process")
+            $env:SM_CLIENT_CERT_FILE = "C:\Temp\DigiCert\certificate.pfx"
 
             Write-Host "Signing $filePath with DigiCert KeyLocker..."
             & $smctlPath sign `
@@ -744,10 +738,7 @@ jobs:
             $env:PATH = "$(Split-Path $signtoolPath);$env:PATH"
             Write-Host "signtool path: $signtoolPath"
 
-            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE", "C:\Temp\DigiCert\certificate.pfx", "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_HOST", "https://clientauth.one.digicert.com", "Process")
-            [System.Environment]::SetEnvironmentVariable("SM_API_KEY", $env:SM_API_KEY, "Process")
+            $env:SM_CLIENT_CERT_FILE = "C:\Temp\DigiCert\certificate.pfx"
 
             $msiFiles = Get-ChildItem -Path dist/msi/en-US -Filter *.msi
             foreach ($msi in $msiFiles) {
