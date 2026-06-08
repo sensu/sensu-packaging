@@ -48,7 +48,6 @@ function(build_sensu_cli_linux_amd64_deb_package)
         "ubuntu/hirsute"
         "ubuntu/jammy"
         "ubuntu/resolute"
-        "ubuntu/raccoon"
         "ubuntu/noble"
         "debian/jessie"
         "debian/stretch"

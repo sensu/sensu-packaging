@@ -19,7 +19,6 @@ function(build_sensu_agent_linux_mips_hardfloat_deb_package)
         "debian/buster"
         "debian/bookworm"
         "ubuntu/resolute"
-        "ubuntu/raccoon"
         "ubuntu/noble"
         "debian/trixie")
 

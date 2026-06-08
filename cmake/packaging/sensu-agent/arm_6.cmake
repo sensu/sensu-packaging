@@ -20,7 +20,6 @@ function(build_sensu_agent_linux_arm_6_deb_package)
         "raspbian/buster"
         "raspbian/bullseye"
         "ubuntu/resolute"
-        "ubuntu/raccoon"
         "ubuntu/noble"
         "raspbian/bookworm")
 
