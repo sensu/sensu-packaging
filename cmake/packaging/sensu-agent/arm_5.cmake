@@ -19,8 +19,6 @@ function(build_sensu_agent_linux_arm_5_deb_package)
         "debian/buster"
         "debian/bullseye"
         "debian/bookworm"
-        "ubuntu/resolute"
-        "ubuntu/noble"
         "debian/trixie")
 
     set_common_settings()

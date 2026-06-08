@@ -19,8 +19,6 @@ function(build_sensu_cli_linux_arm_6_deb_package)
         "raspbian/stretch"
         "raspbian/buster"
         "raspbian/bullseye"
-        "ubuntu/resolute"
-        "ubuntu/noble"
         "debian/trixie")
 
     set_common_settings()
