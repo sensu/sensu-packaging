@@ -271,10 +271,15 @@ commands:
             baseURL="https://github.com/amdprophet/packagecloud-go/releases/download"
             version="0.1.2"
             file="packagecloud-go_${version}_linux_amd64.tar.gz"
-            curl -Lo /tmp/packagecloud-go.tar.gz $baseURL/$version/$file
+            if ! curl -fL -o /tmp/packagecloud-go.tar.gz $baseURL/$version/$file; then
+              echo "Error downloading packagecloud-go: $?"
+            fi
+            echo "Packagecloud-go downloaded successfully!"
       - run:
           name: Install packagecloud-go tool
           command: |
+            file /tmp/packagecloud-go.tar.gz
+            ls -lh /tmp/packagecloud-go.tar.gz
             tar -C /tmp -zxf /tmp/packagecloud-go.tar.gz
             sudo mv /tmp/packagecloud /usr/local/bin
   install-log-collector-linux:
