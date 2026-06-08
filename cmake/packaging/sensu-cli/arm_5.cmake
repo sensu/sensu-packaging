@@ -20,7 +20,6 @@ function(build_sensu_cli_linux_arm_5_deb_package)
         "debian/bullseye"
         "debian/bookworm"
         "ubuntu/resolute"
-        "ubuntu/raccoon"
         "ubuntu/noble"
         "debian/trixie")
 
