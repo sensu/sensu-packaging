@@ -19,8 +19,8 @@ function(build_sensu_cli_linux_mipsle_hardfloat_deb_package)
         "debian/buster"
         "debian/bullseye"
         "debian/bookworm"
-        "ubuntu/resolute"
         "ubuntu/noble"
+        "ubuntu/resolute"
         "debian/trixie")
 
     set_common_settings()

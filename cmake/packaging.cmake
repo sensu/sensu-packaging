@@ -92,7 +92,7 @@ endfunction()
 function(create_cpack_publish_package_target _pc_user _pc_repo _pc_distro _sensu_pkg_name)
     set(_pc_output "${_sensu_pkg_name}-${_pc_distro}")
     separate_arguments(_packagecloud_push_cmd UNIX_COMMAND "packagecloud push --skip-exists ${_pc_user}/${_pc_repo}/${_pc_distro} ${_sensu_pkg_name}")
-    add_custom_command(OUTPUT ${_pc_output}
+        add_custom_command(OUTPUT ${_pc_output}
         COMMAND ${_packagecloud_push_cmd}
         DEPENDS ${_sensu_pkg_name}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
