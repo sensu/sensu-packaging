@@ -18,8 +18,6 @@ function(build_sensu_agent_linux_mips_hardfloat_deb_package)
         "debian/stretch"
         "debian/buster"
         "debian/bookworm"
-        "ubuntu/noble"
-        "ubuntu/resolute"
         "debian/trixie")
 
     set_common_settings()
